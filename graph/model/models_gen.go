@@ -13,7 +13,7 @@ type NewScope struct {
 }
 
 type Project struct {
-	ID    int      `json:"id"`
+	ID    string   `json:"id"`
 	Name  string   `json:"name"`
 	Scope []*Scope `json:"scope"`
 }
@@ -26,6 +26,7 @@ type ProjectList struct {
 
 type Scope struct {
 	Colour   string `json:"colour"`
+	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
 }

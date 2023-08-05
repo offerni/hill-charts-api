@@ -3,13 +3,14 @@
 # https://gqlgen.com/getting-started/
 
 type Project {
-  id: Int!
+  id: String!
   name: String!
   scope: [Scope]
 }
 
 type Scope {
   colour: String!
+  id: String!
   name: String!
   progress: String!
 }
