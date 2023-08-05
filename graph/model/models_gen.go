@@ -2,8 +2,30 @@
 
 package model
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
+type NewProject struct {
+	Name string `json:"name"`
+}
+
+type NewScope struct {
+	Colour   string `json:"colour"`
+	Name     string `json:"name"`
+	Progress string `json:"progress"`
+}
+
+type Project struct {
+	ID    int      `json:"id"`
+	Name  string   `json:"name"`
+	Scope []*Scope `json:"scope"`
+}
+
+type ProjectList struct {
+	Data       []*Project `json:"data"`
+	HasMore    bool       `json:"has_more"`
+	TotalCount int        `json:"total_count"`
+}
+
+type Scope struct {
+	Colour   string `json:"colour"`
+	Name     string `json:"name"`
+	Progress string `json:"progress"`
 }

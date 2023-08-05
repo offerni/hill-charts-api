@@ -2,8 +2,39 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Todo {
-  id: ID!
-  text: String!
-  done: Boolean!
+type Project {
+  id: Int!
+  name: String!
+  scope: [Scope]
+}
+
+type Scope {
+  colour: String!
+  name: String!
+  progress: String!
+}
+
+type ProjectList {
+  data: [Project]
+  has_more: Boolean!
+  total_count: Int!
+}
+
+type Query {
+  pages: ProjectList
+}
+
+input NewProject {
+  name: String!
+}
+
+input NewScope {
+  colour: String!
+  name: String!
+  progress: String!
+}
+
+type Mutation {
+  CreateProject(opts: NewProject!): Project!
+  CreateScope(opts: NewScope!): Scope!
 }
