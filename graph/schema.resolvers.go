@@ -27,7 +27,7 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 // Squads is the resolver for the Squads field.
 func (r *queryResolver) Squads(ctx context.Context) (*model.SquadList, error) {
 	squads, err := r.squadSvc.List(ctx, squad.ListOpts{
-		AccountID:      hillchartsapi.AccountID(1),
+		AccountID:      hillchartsapi.AccountID("1"),
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
 	})
 	if err != nil {

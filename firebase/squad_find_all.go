@@ -40,7 +40,10 @@ func (repo *squadRepo) getSquadsCollection(
 ) ([]*models.Squad, error) {
 	path := fmt.Sprintf("organizations/%s", opts.OrganizationID)
 
-	iter := repo.db.Doc(path).Collection("squads").Where("organization_id", "==", opts.OrganizationID).Documents(ctx)
+	iter := repo.db.Doc(path).Collection("squads").
+		Where("account_id", "==", opts.AccountID).
+		Where("organization_id", "==", opts.OrganizationID).
+		Documents(ctx)
 
 	var squadModel models.Squad
 	var squadModelMultiple []models.Squad

@@ -40,7 +40,10 @@ func (repo *scopeRepo) getScopesCollection(
 ) ([]*models.Scope, error) {
 	path := fmt.Sprintf("organizations/%s/squads/%s", opts.OrganizationID, opts.SquadID)
 
-	iter := repo.db.Doc(path).Collection("scopes").Where("squad_id", "==", opts.SquadID).Documents(ctx)
+	iter := repo.db.Doc(path).Collection("scopes").
+		Where("account_id", "==", opts.AccountID).
+		Where("squad_id", "==", opts.SquadID).
+		Documents(ctx)
 
 	var scopeModel models.Scope
 	var scopeModelMultiple []models.Scope
