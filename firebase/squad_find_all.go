@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	hillchartsapi "github.com/offerni/hill-charts-api"
 	hcerrors "github.com/offerni/hill-charts-api/errors"
 	"github.com/offerni/hill-charts-api/firebase/models"
@@ -43,8 +42,9 @@ func (repo *squadRepo) getSquadsCollection(
 
 	iter := repo.db.Doc(path).Collection("squads").Where("organization_id", "==", opts.OrganizationID).Documents(ctx)
 
-	var squadModel *models.Squad
-	var squadModelMultiple = []*models.Squad{}
+	var squadModel models.Squad
+	var squadModelMultiple []models.Squad
+
 	for {
 		squadRef, err := iter.Next()
 		if err == iterator.Done {
@@ -59,10 +59,19 @@ func (repo *squadRepo) getSquadsCollection(
 			return nil, hcerrors.Wrap("squadRef.DataTo(&squadData)", err)
 		}
 
-		spew.Dump(squadRef.Data())
-
 		squadModelMultiple = append(squadModelMultiple, squadModel)
 	}
 
-	return squadModelMultiple, nil
+	squadModels := []*models.Squad{}
+	for _, squad := range squadModelMultiple {
+		squadModels = append(squadModels, &models.Squad{
+			AccountID:      squad.AccountID,
+			ID:             squad.ID,
+			Name:           squad.Name,
+			OrganizationID: squad.OrganizationID,
+		})
+
+	}
+
+	return squadModels, nil
 }
