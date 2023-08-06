@@ -39,6 +39,11 @@ func main() {
 		hcerrors.Wrap("firebase.NewOrganizationRepository", err)
 	}
 
+	scopeRepo, err := firebase.NewScopeRepository(db)
+	if err != nil {
+		hcerrors.Wrap("firebase.NewScopeRepository", err)
+	}
+
 	squadRepo, err := firebase.NewSquadRepository(db)
 	if err != nil {
 		hcerrors.Wrap("firebase.NewSquadRepository", err)
@@ -46,6 +51,7 @@ func main() {
 
 	squadSvc, err := squad.NewService(squad.NewServiceOpts{
 		OrganizationRepository: organizationRepo,
+		ScopeRepository:        scopeRepo,
 		SquadRepository:        squadRepo,
 	})
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	hillchartsapi "github.com/offerni/hill-charts-api"
 	hcerrors "github.com/offerni/hill-charts-api/errors"
+	"github.com/offerni/hill-charts-api/scope"
 )
 
 func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, error) {
@@ -26,12 +27,21 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 
 	squads := []*FetchResponse{}
 	for _, squad := range squadsList.Squads {
+		scopessList, err := svc.scopeRepo.FindAll(ctx, hillchartsapi.ScopeFindAllOpts{
+			AccountID:      opts.AccountID,
+			OrganizationID: opts.OrganizationID,
+			SquadID:        squad.ID,
+		})
+		if err != nil {
+			return nil, hcerrors.Wrap("svc.SquadRepo.FindAll", err)
+		}
+
 		squads = append(squads, &FetchResponse{
 			ID:               hillchartsapi.SquadID(squad.ID),
 			CurrentCycleName: squad.CurrentCycleName,
 			Name:             squad.Name,
 			OrganizationID:   squad.OrganizationID,
-			Scopes:           []*hillchartsapi.Scope{},
+			Scopes:           svc.buildScopesFetchResponse(scopessList.Scopes),
 		})
 	}
 
@@ -42,9 +52,25 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 	}, nil
 }
 
+func (svc Service) buildScopesFetchResponse(scopes []*hillchartsapi.Scope) []*scope.FetchResponse {
+	resp := []*scope.FetchResponse{}
+	for _, squad := range scopes {
+		resp = append(resp, &scope.FetchResponse{
+			Colour:   squad.Colour,
+			ID:       squad.ID,
+			Name:     squad.Name,
+			Progress: squad.Progress,
+			SquadID:  squad.SquadID,
+		})
+	}
+
+	return resp
+}
+
 type ListOpts struct {
 	AccountID      hillchartsapi.AccountID
 	OrganizationID hillchartsapi.OrganizationID
+	SquadID        hillchartsapi.SquadID
 }
 
 type ListResponse struct {
