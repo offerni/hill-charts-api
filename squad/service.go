@@ -6,12 +6,14 @@ type Service struct {
 	organizationRepo hillchartsapi.OrganizationRepository
 	scopeRepo        hillchartsapi.ScopeRepository
 	squadRepo        hillchartsapi.SquadRepository
+	userRepo         hillchartsapi.UserRepository
 }
 
 type NewServiceOpts struct {
 	OrganizationRepository hillchartsapi.OrganizationRepository
 	ScopeRepository        hillchartsapi.ScopeRepository
 	SquadRepository        hillchartsapi.SquadRepository
+	UserRepository         hillchartsapi.UserRepository
 }
 
 func (opts NewServiceOpts) Validate() error {
@@ -27,6 +29,10 @@ func (opts NewServiceOpts) Validate() error {
 		return ErrNoSquadRepository
 	}
 
+	if opts.UserRepository == nil {
+		return ErrNoUserRepository
+	}
+
 	return nil
 }
 
@@ -39,5 +45,6 @@ func NewService(opts NewServiceOpts) (*Service, error) {
 		organizationRepo: opts.OrganizationRepository,
 		scopeRepo:        opts.ScopeRepository,
 		squadRepo:        opts.SquadRepository,
+		userRepo:         opts.UserRepository,
 	}, nil
 }

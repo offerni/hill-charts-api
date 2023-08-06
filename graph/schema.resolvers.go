@@ -29,6 +29,7 @@ func (r *queryResolver) Squads(ctx context.Context) (*model.SquadList, error) {
 	squads, err := r.squadSvc.List(ctx, squad.ListOpts{
 		AccountID:      hillchartsapi.AccountID("1"),
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		UserID:         hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 	if err != nil {
 		return nil, err

@@ -9,12 +9,27 @@ import (
 )
 
 func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, error) {
-	_, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
+	// TODO: implement validation here
+
+	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
 		AccountID: opts.AccountID,
 		ID:        opts.OrganizationID,
 	})
 	if err != nil {
-		return nil, hcerrors.Wrap("svc.organizationRepo.Find", err)
+		return nil, ErrOganizationNotFound
+	}
+
+	user, err := svc.userRepo.Find(ctx, hillchartsapi.UserFindOpts{
+		AccountID:      opts.AccountID,
+		ID:             opts.UserID,
+		OrganizationID: opts.OrganizationID,
+	})
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	if user.OrganizationID != org.ID {
+		return nil, ErrUserDoesNotBelongToOrganization
 	}
 
 	squadsList, err := svc.squadRepo.FindAll(ctx, hillchartsapi.SquadFindAllOpts{
@@ -71,6 +86,7 @@ type ListOpts struct {
 	AccountID      hillchartsapi.AccountID
 	OrganizationID hillchartsapi.OrganizationID
 	SquadID        hillchartsapi.SquadID
+	UserID         hillchartsapi.UserID
 }
 
 type ListResponse struct {
