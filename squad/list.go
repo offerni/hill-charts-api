@@ -3,13 +3,12 @@ package squad
 import (
 	"context"
 
-	"github.com/davecgh/go-spew/spew"
 	hillchartsapi "github.com/offerni/hill-charts-api"
 	hcerrors "github.com/offerni/hill-charts-api/errors"
 )
 
 func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, error) {
-	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
+	_, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
 		AccountID: opts.AccountID,
 		ID:        opts.OrganizationID,
 	})
@@ -17,7 +16,16 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 		return nil, hcerrors.Wrap("svc.organizationRepo.Find", err)
 	}
 
-	spew.Dump(org)
+	_, err = svc.squadRepo.FindAll(ctx, hillchartsapi.SquadFindAllOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+	})
+
+	if err != nil {
+		return nil, hcerrors.Wrap("svc.SquadRepo.FindAll", err)
+	}
+
+	// spew.Dump("From Service Layer", squad)
 
 	return &ListResponse{
 		HasMore:    false,

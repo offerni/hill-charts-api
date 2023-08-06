@@ -1,6 +1,6 @@
 package hillchartsapi
 
-import "github.com/labstack/echo"
+import "context"
 
 type SquadID string
 
@@ -33,6 +33,6 @@ type SquadFindAllOpts struct {
 }
 
 type SquadRepository interface {
-	Create(ctx echo.Context, opts SquadCreateOpts) (*Squad, error)
-	FindAll(ctx echo.Context, opts SquadFindAllOpts) (*SquadList, error)
+	// Create(ctx context.Context, opts SquadCreateOpts) (*Squad, error)
+	FindAll(ctx context.Context, opts SquadFindAllOpts) (*SquadList, error)
 }

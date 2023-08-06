@@ -1,6 +1,6 @@
 package hillchartsapi
 
-import "github.com/labstack/echo"
+import "context"
 
 type ScopeID string
 
@@ -22,5 +22,5 @@ type ScopeCreateOpts struct {
 }
 
 type ScopeRepository interface {
-	Create(ctx echo.Context, opts ScopeCreateOpts) (*Scope, error)
+	Create(ctx context.Context, opts ScopeCreateOpts) (*Scope, error)
 }
