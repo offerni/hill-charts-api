@@ -6,6 +6,7 @@ type NewScope struct {
 	Colour   string `json:"colour"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
+	SquadID  string `json:"squad_id"`
 }
 
 type NewSquad struct {
@@ -17,6 +18,7 @@ type Scope struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
+	SquadID  string `json:"squad_id"`
 }
 
 type Squad struct {

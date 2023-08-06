@@ -57,6 +57,7 @@ type ComplexityRoot struct {
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Progress func(childComplexity int) int
+		SquadID  func(childComplexity int) int
 	}
 
 	Squad struct {
@@ -154,6 +155,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Scope.Progress(childComplexity), true
+
+	case "Scope.squad_id":
+		if e.complexity.Scope.SquadID == nil {
+			break
+		}
+
+		return e.complexity.Scope.SquadID(childComplexity), true
 
 	case "Squad.current_cycle_name":
 		if e.complexity.Squad.CurrentCycleName == nil {
@@ -290,6 +298,7 @@ type Scope {
   id: String!
   name: String!
   progress: String!
+  squad_id: String!
 }
 
 type SquadList {
@@ -310,6 +319,7 @@ input NewScope {
   colour: String!
   name: String!
   progress: String!
+  squad_id: String!
 }
 
 type Mutation {
@@ -519,6 +529,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Contex
 				return ec.fieldContext_Scope_name(ctx, field)
 			case "progress":
 				return ec.fieldContext_Scope_progress(ctx, field)
+			case "squad_id":
+				return ec.fieldContext_Scope_squad_id(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Scope", field.Name)
 		},
@@ -891,6 +903,50 @@ func (ec *executionContext) fieldContext_Scope_progress(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Scope_squad_id(ctx context.Context, field graphql.CollectedField, obj *model.Scope) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Scope_squad_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SquadID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Scope_squad_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Scope",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Squad_current_cycle_name(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Squad_current_cycle_name(ctx, field)
 	if err != nil {
@@ -1067,6 +1123,8 @@ func (ec *executionContext) fieldContext_Squad_scope(ctx context.Context, field 
 				return ec.fieldContext_Scope_name(ctx, field)
 			case "progress":
 				return ec.fieldContext_Scope_progress(ctx, field)
+			case "squad_id":
+				return ec.fieldContext_Scope_squad_id(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Scope", field.Name)
 		},
@@ -2993,7 +3051,7 @@ func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"colour", "name", "progress"}
+	fieldsInOrder := [...]string{"colour", "name", "progress", "squad_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3021,6 +3079,14 @@ func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("progress"))
 			it.Progress, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "squad_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("squad_id"))
+			it.SquadID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3210,6 +3276,13 @@ func (ec *executionContext) _Scope(ctx context.Context, sel ast.SelectionSet, ob
 		case "progress":
 
 			out.Values[i] = ec._Scope_progress(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "squad_id":
+
+			out.Values[i] = ec._Scope_squad_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++

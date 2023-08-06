@@ -14,6 +14,7 @@ type Scope {
   id: String!
   name: String!
   progress: String!
+  squad_id: String!
 }
 
 type SquadList {
@@ -34,6 +35,7 @@ input NewScope {
   colour: String!
   name: String!
   progress: String!
+  squad_id: String!
 }
 
 type Mutation {
