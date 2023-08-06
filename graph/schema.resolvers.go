@@ -34,16 +34,18 @@ func (r *queryResolver) Squads(ctx context.Context) (*model.SquadList, error) {
 		return nil, err
 	}
 
-	var squadsResp = make([]*model.Squad, len(squads.Data))
-
-	for i, squad := range squads.Data {
-		squadsResp[i].CurrentCycleName = squad.CurrentCycleName
-		squadsResp[i].ID = string(squad.ID)
-		squadsResp[i].Name = squad.Name
+	var squadsResp = []*model.Squad{}
+	for _, squad := range squads.Data {
+		squadsResp = append(squadsResp, &model.Squad{
+			CurrentCycleName: squad.CurrentCycleName,
+			ID:               string(squad.ID),
+			Name:             squad.Name,
+			Scope:            []*model.Scope{},
+		})
 	}
 
 	return &model.SquadList{
-		Data:       []*model.Squad{},
+		Data:       squadsResp,
 		HasMore:    squads.HasMore,
 		TotalCount: squads.TotalCount,
 	}, nil

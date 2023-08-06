@@ -16,20 +16,29 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 		return nil, hcerrors.Wrap("svc.organizationRepo.Find", err)
 	}
 
-	_, err = svc.squadRepo.FindAll(ctx, hillchartsapi.SquadFindAllOpts{
+	squadsList, err := svc.squadRepo.FindAll(ctx, hillchartsapi.SquadFindAllOpts{
 		AccountID:      opts.AccountID,
 		OrganizationID: opts.OrganizationID,
 	})
-
 	if err != nil {
 		return nil, hcerrors.Wrap("svc.SquadRepo.FindAll", err)
 	}
 
-	// spew.Dump("From Service Layer", squad)
+	squads := []*FetchResponse{}
+	for _, squad := range squadsList.Squads {
+		squads = append(squads, &FetchResponse{
+			ID:               hillchartsapi.SquadID(squad.ID),
+			CurrentCycleName: squad.CurrentCycleName,
+			Name:             squad.Name,
+			OrganizationID:   squad.OrganizationID,
+			Scopes:           []*hillchartsapi.Scope{},
+		})
+	}
 
 	return &ListResponse{
-		HasMore:    false,
-		TotalCount: 10, // revisit all this
+		Data:       squads,
+		HasMore:    squadsList.HasMore,
+		TotalCount: squadsList.TotalCount,
 	}, nil
 }
 

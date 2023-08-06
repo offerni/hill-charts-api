@@ -21,17 +21,10 @@ func (repo *squadRepo) FindAll(
 		return nil, err
 	}
 
-	squads := make([]*hillchartsapi.Squad, len(resp))
-
-	for i, squad := range resp {
-		squads[i].AccountID = hillchartsapi.AccountID(squad.AccountID)
-		squads[i].CurrentCycleName = ""
-		squads[i].ID = hillchartsapi.SquadID(squad.ID)
-		squads[i].Name = squad.Name
-		squads[i].OrganizationID = hillchartsapi.OrganizationID(squad.OrganizationID)
+	squads := []*hillchartsapi.Squad{}
+	for _, mSquad := range resp {
+		squads = append(squads, models.ConvertSquadModelToDomain(mSquad))
 	}
-
-	spew.Dump(resp)
 
 	return &hillchartsapi.SquadList{
 		Squads: squads,
@@ -40,7 +33,6 @@ func (repo *squadRepo) FindAll(
 			TotalCount: len(squads),
 		},
 	}, nil
-
 }
 
 func (repo *squadRepo) getSquadsCollection(
@@ -51,8 +43,8 @@ func (repo *squadRepo) getSquadsCollection(
 
 	iter := repo.db.Doc(path).Collection("squads").Where("organization_id", "==", opts.OrganizationID).Documents(ctx)
 
-	var squadData []*models.Squad
-
+	var squadModel *models.Squad
+	var squadModelMultiple = []*models.Squad{}
 	for {
 		squadRef, err := iter.Next()
 		if err == iterator.Done {
@@ -62,7 +54,15 @@ func (repo *squadRepo) getSquadsCollection(
 		if err != nil {
 			return nil, hcerrors.Wrap("iter.Next()", err)
 		}
-		fmt.Println(squadRef.Data())
+
+		if err := squadRef.DataTo(&squadModel); err != nil {
+			return nil, hcerrors.Wrap("squadRef.DataTo(&squadData)", err)
+		}
+
+		spew.Dump(squadRef.Data())
+
+		squadModelMultiple = append(squadModelMultiple, squadModel)
 	}
-	return squadData, nil
+
+	return squadModelMultiple, nil
 }
