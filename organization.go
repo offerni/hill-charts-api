@@ -1,6 +1,6 @@
 package hillchartsapi
 
-import "github.com/labstack/echo"
+import "context"
 
 type OrganizationID string
 
@@ -10,11 +10,12 @@ type Organization struct {
 	Name      string
 }
 
-type OrganizationCreateOpts struct {
+type OrganizationFindOpts struct {
 	AccountID AccountID
+	ID        OrganizationID
 	Name      string
 }
 
 type OrganizationRepository interface {
-	Create(ctx echo.Context, opts OrganizationCreateOpts) (*Organization, error)
+	Find(ctx context.Context, opts OrganizationFindOpts) (*Organization, error)
 }

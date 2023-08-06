@@ -34,5 +34,5 @@ type SquadFindAllOpts struct {
 
 type SquadRepository interface {
 	Create(ctx echo.Context, opts SquadCreateOpts) (*Squad, error)
-	List(ctx echo.Context, opts SquadFindAllOpts) (*SquadList, error)
+	FindAll(ctx echo.Context, opts SquadFindAllOpts) (*SquadList, error)
 }

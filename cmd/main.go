@@ -14,8 +14,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	hcerrors "github.com/offerni/hill-charts-api/errors"
+	"github.com/offerni/hill-charts-api/firebase"
 	"github.com/offerni/hill-charts-api/graph"
 	"github.com/offerni/hill-charts-api/graph/generated"
+	"github.com/offerni/hill-charts-api/squad"
 	"github.com/rs/cors"
 	"google.golang.org/api/option"
 )
@@ -26,10 +28,27 @@ const httpDefaultPort = "9091"
 func main() {
 	_ = godotenv.Load()
 
-	_, err := newDB()
+	db, err := newDB()
 	if err != nil {
 		log.Panicln("newDB Error:", err)
 	}
+	defer db.Close()
+
+	organizationRepo, err := firebase.NewOrganizationRepository(db)
+	if err != nil {
+		hcerrors.Wrap("firebase.NewOrganizationRepository", err)
+	}
+
+	squadSvc, err := squad.NewService(squad.NewServiceOpts{
+		OrganizationRepository: organizationRepo,
+	})
+	if err != nil {
+		hcerrors.Wrap("squad.NewService", err)
+	}
+
+	gqlResolver := graph.NewResolver(graph.NewResolverOpts{
+		SquadService: squadSvc,
+	})
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -41,7 +60,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		initGraphQLServer()
+		initGraphQLServer(gqlResolver)
 	}()
 
 	wg.Wait()
@@ -60,7 +79,7 @@ func newDB() (*firestore.Client, error) {
 	return client, nil
 }
 
-func initGraphQLServer() {
+func initGraphQLServer(gqlResolver *graph.Resolver) {
 	router := chi.NewRouter()
 
 	router.Use(cors.New(cors.Options{
@@ -73,7 +92,7 @@ func initGraphQLServer() {
 		port = graphQLDefaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: gqlResolver}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)

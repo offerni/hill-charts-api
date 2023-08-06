@@ -6,9 +6,12 @@ package graph
 import (
 	"context"
 	"fmt"
+	"os"
 
+	hillchartsapi "github.com/offerni/hill-charts-api"
 	"github.com/offerni/hill-charts-api/graph/generated"
 	"github.com/offerni/hill-charts-api/graph/model"
+	"github.com/offerni/hill-charts-api/squad"
 )
 
 // CreateSquad is the resolver for the CreateSquad field.
@@ -23,7 +26,27 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 
 // Squads is the resolver for the Squads field.
 func (r *queryResolver) Squads(ctx context.Context) (*model.SquadList, error) {
-	panic(fmt.Errorf("not implemented: Squads - Squads"))
+	squads, err := r.squadSvc.List(ctx, squad.ListOpts{
+		AccountID:      hillchartsapi.AccountID(1),
+		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var squadsResp = make([]*model.Squad, len(squads.Data))
+
+	for i, squad := range squads.Data {
+		squadsResp[i].CurrentCycleName = squad.CurrentCycleName
+		squadsResp[i].ID = string(squad.ID)
+		squadsResp[i].Name = squad.Name
+	}
+
+	return &model.SquadList{
+		Data:       []*model.Squad{},
+		HasMore:    squads.HasMore,
+		TotalCount: squads.TotalCount,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
