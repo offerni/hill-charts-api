@@ -2,26 +2,14 @@
 
 package model
 
-type NewProject struct {
-	Name string `json:"name"`
-}
-
 type NewScope struct {
 	Colour   string `json:"colour"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
 }
 
-type Project struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	Scope []*Scope `json:"scope"`
-}
-
-type ProjectList struct {
-	Data       []*Project `json:"data"`
-	HasMore    bool       `json:"has_more"`
-	TotalCount int        `json:"total_count"`
+type NewSquad struct {
+	Name string `json:"name"`
 }
 
 type Scope struct {
@@ -29,4 +17,17 @@ type Scope struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Progress string `json:"progress"`
+}
+
+type Squad struct {
+	CurrentCycleName string   `json:"current_cycle_name"`
+	ID               string   `json:"id"`
+	Name             string   `json:"name"`
+	Scope            []*Scope `json:"scope"`
+}
+
+type SquadList struct {
+	Data       []*Squad `json:"data"`
+	HasMore    bool     `json:"has_more"`
+	TotalCount int      `json:"total_count"`
 }

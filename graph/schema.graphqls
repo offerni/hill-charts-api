@@ -2,7 +2,8 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Project {
+type Squad {
+  current_cycle_name: String!
   id: String!
   name: String!
   scope: [Scope]
@@ -15,17 +16,17 @@ type Scope {
   progress: String!
 }
 
-type ProjectList {
-  data: [Project]
+type SquadList {
+  data: [Squad]
   has_more: Boolean!
   total_count: Int!
 }
 
 type Query {
-  projects: ProjectList
+  Squads: SquadList
 }
 
-input NewProject {
+input NewSquad {
   name: String!
 }
 
@@ -36,6 +37,6 @@ input NewScope {
 }
 
 type Mutation {
-  CreateProject(opts: NewProject!): Project!
+  CreateSquad(opts: NewSquad!): Squad!
   CreateScope(opts: NewScope!): Scope!
 }

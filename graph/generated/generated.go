@@ -44,24 +44,12 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
-		CreateProject func(childComplexity int, opts model.NewProject) int
-		CreateScope   func(childComplexity int, opts model.NewScope) int
-	}
-
-	Project struct {
-		ID    func(childComplexity int) int
-		Name  func(childComplexity int) int
-		Scope func(childComplexity int) int
-	}
-
-	ProjectList struct {
-		Data       func(childComplexity int) int
-		HasMore    func(childComplexity int) int
-		TotalCount func(childComplexity int) int
+		CreateScope func(childComplexity int, opts model.NewScope) int
+		CreateSquad func(childComplexity int, opts model.NewSquad) int
 	}
 
 	Query struct {
-		Projects func(childComplexity int) int
+		Squads func(childComplexity int) int
 	}
 
 	Scope struct {
@@ -70,14 +58,27 @@ type ComplexityRoot struct {
 		Name     func(childComplexity int) int
 		Progress func(childComplexity int) int
 	}
+
+	Squad struct {
+		CurrentCycleName func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Name             func(childComplexity int) int
+		Scope            func(childComplexity int) int
+	}
+
+	SquadList struct {
+		Data       func(childComplexity int) int
+		HasMore    func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
-	CreateProject(ctx context.Context, opts model.NewProject) (*model.Project, error)
+	CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error)
 	CreateScope(ctx context.Context, opts model.NewScope) (*model.Scope, error)
 }
 type QueryResolver interface {
-	Projects(ctx context.Context) (*model.ProjectList, error)
+	Squads(ctx context.Context) (*model.SquadList, error)
 }
 
 type executableSchema struct {
@@ -95,18 +96,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Mutation.CreateProject":
-		if e.complexity.Mutation.CreateProject == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_CreateProject_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateProject(childComplexity, args["opts"].(model.NewProject)), true
-
 	case "Mutation.CreateScope":
 		if e.complexity.Mutation.CreateScope == nil {
 			break
@@ -119,54 +108,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateScope(childComplexity, args["opts"].(model.NewScope)), true
 
-	case "Project.id":
-		if e.complexity.Project.ID == nil {
+	case "Mutation.CreateSquad":
+		if e.complexity.Mutation.CreateSquad == nil {
 			break
 		}
 
-		return e.complexity.Project.ID(childComplexity), true
+		args, err := ec.field_Mutation_CreateSquad_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "Project.name":
-		if e.complexity.Project.Name == nil {
+		return e.complexity.Mutation.CreateSquad(childComplexity, args["opts"].(model.NewSquad)), true
+
+	case "Query.Squads":
+		if e.complexity.Query.Squads == nil {
 			break
 		}
 
-		return e.complexity.Project.Name(childComplexity), true
-
-	case "Project.scope":
-		if e.complexity.Project.Scope == nil {
-			break
-		}
-
-		return e.complexity.Project.Scope(childComplexity), true
-
-	case "ProjectList.data":
-		if e.complexity.ProjectList.Data == nil {
-			break
-		}
-
-		return e.complexity.ProjectList.Data(childComplexity), true
-
-	case "ProjectList.has_more":
-		if e.complexity.ProjectList.HasMore == nil {
-			break
-		}
-
-		return e.complexity.ProjectList.HasMore(childComplexity), true
-
-	case "ProjectList.total_count":
-		if e.complexity.ProjectList.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.ProjectList.TotalCount(childComplexity), true
-
-	case "Query.projects":
-		if e.complexity.Query.Projects == nil {
-			break
-		}
-
-		return e.complexity.Query.Projects(childComplexity), true
+		return e.complexity.Query.Squads(childComplexity), true
 
 	case "Scope.colour":
 		if e.complexity.Scope.Colour == nil {
@@ -196,6 +155,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Scope.Progress(childComplexity), true
 
+	case "Squad.current_cycle_name":
+		if e.complexity.Squad.CurrentCycleName == nil {
+			break
+		}
+
+		return e.complexity.Squad.CurrentCycleName(childComplexity), true
+
+	case "Squad.id":
+		if e.complexity.Squad.ID == nil {
+			break
+		}
+
+		return e.complexity.Squad.ID(childComplexity), true
+
+	case "Squad.name":
+		if e.complexity.Squad.Name == nil {
+			break
+		}
+
+		return e.complexity.Squad.Name(childComplexity), true
+
+	case "Squad.scope":
+		if e.complexity.Squad.Scope == nil {
+			break
+		}
+
+		return e.complexity.Squad.Scope(childComplexity), true
+
+	case "SquadList.data":
+		if e.complexity.SquadList.Data == nil {
+			break
+		}
+
+		return e.complexity.SquadList.Data(childComplexity), true
+
+	case "SquadList.has_more":
+		if e.complexity.SquadList.HasMore == nil {
+			break
+		}
+
+		return e.complexity.SquadList.HasMore(childComplexity), true
+
+	case "SquadList.total_count":
+		if e.complexity.SquadList.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.SquadList.TotalCount(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -204,8 +212,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNewProject,
 		ec.unmarshalInputNewScope,
+		ec.unmarshalInputNewSquad,
 	)
 	first := true
 
@@ -270,7 +278,8 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
-type Project {
+type Squad {
+  current_cycle_name: String!
   id: String!
   name: String!
   scope: [Scope]
@@ -283,17 +292,17 @@ type Scope {
   progress: String!
 }
 
-type ProjectList {
-  data: [Project]
+type SquadList {
+  data: [Squad]
   has_more: Boolean!
   total_count: Int!
 }
 
 type Query {
-  projects: ProjectList
+  Squads: SquadList
 }
 
-input NewProject {
+input NewSquad {
   name: String!
 }
 
@@ -304,7 +313,7 @@ input NewScope {
 }
 
 type Mutation {
-  CreateProject(opts: NewProject!): Project!
+  CreateSquad(opts: NewSquad!): Squad!
   CreateScope(opts: NewScope!): Scope!
 }
 `, BuiltIn: false},
@@ -315,13 +324,13 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_CreateProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_CreateScope_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewProject
+	var arg0 model.NewScope
 	if tmp, ok := rawArgs["opts"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("opts"))
-		arg0, err = ec.unmarshalNNewProject2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewProject(ctx, tmp)
+		arg0, err = ec.unmarshalNNewScope2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewScope(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -330,13 +339,13 @@ func (ec *executionContext) field_Mutation_CreateProject_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_CreateScope_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_CreateSquad_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewScope
+	var arg0 model.NewSquad
 	if tmp, ok := rawArgs["opts"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("opts"))
-		arg0, err = ec.unmarshalNNewScope2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewScope(ctx, tmp)
+		arg0, err = ec.unmarshalNNewSquad2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewSquad(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -398,8 +407,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Mutation_CreateProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_CreateProject(ctx, field)
+func (ec *executionContext) _Mutation_CreateSquad(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_CreateSquad(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -412,7 +421,7 @@ func (ec *executionContext) _Mutation_CreateProject(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateProject(rctx, fc.Args["opts"].(model.NewProject))
+		return ec.resolvers.Mutation().CreateSquad(rctx, fc.Args["opts"].(model.NewSquad))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -424,12 +433,12 @@ func (ec *executionContext) _Mutation_CreateProject(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Project)
+	res := resTmp.(*model.Squad)
 	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx, field.Selections, res)
+	return ec.marshalNSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_CreateProject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_CreateSquad(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -437,14 +446,16 @@ func (ec *executionContext) fieldContext_Mutation_CreateProject(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "current_cycle_name":
+				return ec.fieldContext_Squad_current_cycle_name(ctx, field)
 			case "id":
-				return ec.fieldContext_Project_id(ctx, field)
+				return ec.fieldContext_Squad_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Project_name(ctx, field)
+				return ec.fieldContext_Squad_name(ctx, field)
 			case "scope":
-				return ec.fieldContext_Project_scope(ctx, field)
+				return ec.fieldContext_Squad_scope(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Squad", field.Name)
 		},
 	}
 	defer func() {
@@ -454,7 +465,7 @@ func (ec *executionContext) fieldContext_Mutation_CreateProject(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_CreateProject_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_CreateSquad_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -526,8 +537,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Project_id(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Project_id(ctx, field)
+func (ec *executionContext) _Query_Squads(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_Squads(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -540,95 +551,7 @@ func (ec *executionContext) _Project_id(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Project_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Project_name(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Project_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Project_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Project_scope(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Project_scope(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Scope, nil
+		return ec.resolvers.Query().Squads(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -637,200 +560,12 @@ func (ec *executionContext) _Project_scope(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Scope)
+	res := resTmp.(*model.SquadList)
 	fc.Result = res
-	return ec.marshalOScope2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx, field.Selections, res)
+	return ec.marshalOSquadList2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquadList(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Project_scope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "colour":
-				return ec.fieldContext_Scope_colour(ctx, field)
-			case "id":
-				return ec.fieldContext_Scope_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Scope_name(ctx, field)
-			case "progress":
-				return ec.fieldContext_Scope_progress(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Scope", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectList_data(ctx context.Context, field graphql.CollectedField, obj *model.ProjectList) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectList_data(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Data, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Project)
-	fc.Result = res
-	return ec.marshalOProject2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectList_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectList",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Project_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Project_name(ctx, field)
-			case "scope":
-				return ec.fieldContext_Project_scope(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectList_has_more(ctx context.Context, field graphql.CollectedField, obj *model.ProjectList) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectList_has_more(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HasMore, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectList_has_more(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectList",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectList_total_count(ctx context.Context, field graphql.CollectedField, obj *model.ProjectList) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectList_total_count(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectList_total_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectList",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_projects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_projects(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Projects(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ProjectList)
-	fc.Result = res
-	return ec.marshalOProjectList2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProjectList(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_projects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_Squads(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -839,13 +574,13 @@ func (ec *executionContext) fieldContext_Query_projects(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "data":
-				return ec.fieldContext_ProjectList_data(ctx, field)
+				return ec.fieldContext_SquadList_data(ctx, field)
 			case "has_more":
-				return ec.fieldContext_ProjectList_has_more(ctx, field)
+				return ec.fieldContext_SquadList_has_more(ctx, field)
 			case "total_count":
-				return ec.fieldContext_ProjectList_total_count(ctx, field)
+				return ec.fieldContext_SquadList_total_count(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectList", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type SquadList", field.Name)
 		},
 	}
 	return fc, nil
@@ -1151,6 +886,328 @@ func (ec *executionContext) fieldContext_Scope_progress(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Squad_current_cycle_name(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_current_cycle_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentCycleName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_current_cycle_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Squad_id(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Squad_name(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Squad_scope(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_scope(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scope, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Scope)
+	fc.Result = res
+	return ec.marshalOScope2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_scope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "colour":
+				return ec.fieldContext_Scope_colour(ctx, field)
+			case "id":
+				return ec.fieldContext_Scope_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Scope_name(ctx, field)
+			case "progress":
+				return ec.fieldContext_Scope_progress(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Scope", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SquadList_data(ctx context.Context, field graphql.CollectedField, obj *model.SquadList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SquadList_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Squad)
+	fc.Result = res
+	return ec.marshalOSquad2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SquadList_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SquadList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "current_cycle_name":
+				return ec.fieldContext_Squad_current_cycle_name(ctx, field)
+			case "id":
+				return ec.fieldContext_Squad_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Squad_name(ctx, field)
+			case "scope":
+				return ec.fieldContext_Squad_scope(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Squad", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SquadList_has_more(ctx context.Context, field graphql.CollectedField, obj *model.SquadList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SquadList_has_more(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasMore, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SquadList_has_more(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SquadList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SquadList_total_count(ctx context.Context, field graphql.CollectedField, obj *model.SquadList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SquadList_total_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SquadList_total_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SquadList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2929,34 +2986,6 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNewProject(ctx context.Context, obj interface{}) (model.NewProject, error) {
-	var it model.NewProject
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"name"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj interface{}) (model.NewScope, error) {
 	var it model.NewScope
 	asMap := map[string]interface{}{}
@@ -3001,6 +3030,34 @@ func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewSquad(ctx context.Context, obj interface{}) (model.NewSquad, error) {
+	var it model.NewSquad
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3028,10 +3085,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "CreateProject":
+		case "CreateSquad":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_CreateProject(ctx, field)
+				return ec._Mutation_CreateSquad(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -3042,84 +3099,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_CreateScope(ctx, field)
 			})
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var projectImplementors = []string{"Project"}
-
-func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *model.Project) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Project")
-		case "id":
-
-			out.Values[i] = ec._Project_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "name":
-
-			out.Values[i] = ec._Project_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "scope":
-
-			out.Values[i] = ec._Project_scope(ctx, field, obj)
-
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var projectListImplementors = []string{"ProjectList"}
-
-func (ec *executionContext) _ProjectList(ctx context.Context, sel ast.SelectionSet, obj *model.ProjectList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectListImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectList")
-		case "data":
-
-			out.Values[i] = ec._ProjectList_data(ctx, field, obj)
-
-		case "has_more":
-
-			out.Values[i] = ec._ProjectList_has_more(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "total_count":
-
-			out.Values[i] = ec._ProjectList_total_count(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3154,7 +3133,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "projects":
+		case "Squads":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -3163,7 +3142,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_projects(ctx, field)
+				res = ec._Query_Squads(ctx, field)
 				return res
 			}
 
@@ -3231,6 +3210,91 @@ func (ec *executionContext) _Scope(ctx context.Context, sel ast.SelectionSet, ob
 		case "progress":
 
 			out.Values[i] = ec._Scope_progress(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var squadImplementors = []string{"Squad"}
+
+func (ec *executionContext) _Squad(ctx context.Context, sel ast.SelectionSet, obj *model.Squad) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, squadImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Squad")
+		case "current_cycle_name":
+
+			out.Values[i] = ec._Squad_current_cycle_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "id":
+
+			out.Values[i] = ec._Squad_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+
+			out.Values[i] = ec._Squad_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "scope":
+
+			out.Values[i] = ec._Squad_scope(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var squadListImplementors = []string{"SquadList"}
+
+func (ec *executionContext) _SquadList(ctx context.Context, sel ast.SelectionSet, obj *model.SquadList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, squadListImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SquadList")
+		case "data":
+
+			out.Values[i] = ec._SquadList_data(ctx, field, obj)
+
+		case "has_more":
+
+			out.Values[i] = ec._SquadList_has_more(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total_count":
+
+			out.Values[i] = ec._SquadList_total_count(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3594,28 +3658,14 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) unmarshalNNewProject2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewProject(ctx context.Context, v interface{}) (model.NewProject, error) {
-	res, err := ec.unmarshalInputNewProject(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNNewScope2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewScope(ctx context.Context, v interface{}) (model.NewScope, error) {
 	res, err := ec.unmarshalInputNewScope(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProject2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v model.Project) graphql.Marshaler {
-	return ec._Project(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v *model.Project) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Project(ctx, sel, v)
+func (ec *executionContext) unmarshalNNewSquad2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐNewSquad(ctx context.Context, v interface{}) (model.NewSquad, error) {
+	res, err := ec.unmarshalInputNewSquad(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNScope2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx context.Context, sel ast.SelectionSet, v model.Scope) graphql.Marshaler {
@@ -3630,6 +3680,20 @@ func (ec *executionContext) marshalNScope2ᚖgithubᚗcomᚋofferniᚋhillᚑcha
 		return graphql.Null
 	}
 	return ec._Scope(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSquad2githubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx context.Context, sel ast.SelectionSet, v model.Squad) graphql.Marshaler {
+	return ec._Squad(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx context.Context, sel ast.SelectionSet, v *model.Squad) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Squad(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3926,61 +3990,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOProject2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v []*model.Project) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOProject2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOProject2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProject(ctx context.Context, sel ast.SelectionSet, v *model.Project) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Project(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOProjectList2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐProjectList(ctx context.Context, sel ast.SelectionSet, v *model.ProjectList) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ProjectList(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOScope2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx context.Context, sel ast.SelectionSet, v []*model.Scope) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4027,6 +4036,61 @@ func (ec *executionContext) marshalOScope2ᚖgithubᚗcomᚋofferniᚋhillᚑcha
 		return graphql.Null
 	}
 	return ec._Scope(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSquad2ᚕᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx context.Context, sel ast.SelectionSet, v []*model.Squad) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx context.Context, sel ast.SelectionSet, v *model.Squad) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Squad(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSquadList2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquadList(ctx context.Context, sel ast.SelectionSet, v *model.SquadList) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SquadList(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

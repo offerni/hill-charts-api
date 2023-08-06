@@ -1,3 +1,3 @@
 package hillchartsapi
 
-type AccountID string
+type UserID string
