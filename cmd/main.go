@@ -1,26 +1,37 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 
+	"cloud.google.com/go/firestore"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
+	hcerrors "github.com/offerni/hill-charts-api/errors"
 	"github.com/offerni/hill-charts-api/graph"
 	"github.com/offerni/hill-charts-api/graph/generated"
 	"github.com/rs/cors"
+	"google.golang.org/api/option"
 )
 
 const graphQLDefaultPort = "9092"
 const httpDefaultPort = "9091"
 
 func main() {
-	var wg sync.WaitGroup
+	_ = godotenv.Load()
 
+	_, err := newDB()
+	if err != nil {
+		log.Panicln("newDB Error:", err)
+	}
+
+	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -34,6 +45,19 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func newDB() (*firestore.Client, error) {
+	ctx := context.Background()
+	opts := option.WithCredentialsFile("./service_account.json")
+	projectID := os.Getenv("PROJECT_ID")
+
+	client, err := firestore.NewClient(ctx, projectID, opts)
+	if err != nil {
+		return nil, hcerrors.Wrap("firestore.NewClient", err)
+	}
+
+	return client, nil
 }
 
 func initGraphQLServer() {
@@ -69,7 +93,7 @@ func initRESTServer() {
 
 	log.Printf("connect to http://localhost:%s/ for the REST API Server", port)
 	if err := e.Start(":" + port); err != http.ErrServerClosed {
-		log.Fatal(err)
+		log.Fatal(hcerrors.Wrap("initRESTServer", err))
 	}
 
 }
