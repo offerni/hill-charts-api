@@ -98,7 +98,7 @@ func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *mod
 		ID:             hillchartsapi.ScopeID(id),
 		Name:           opts.Name,
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
-		Progress:       strToFloat32(*opts.Progress),
+		Progress:       strToFloat32(opts.Progress),
 	})
 	if err != nil {
 		return nil, err

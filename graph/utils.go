@@ -37,16 +37,17 @@ func float32ToStr(number float32) string {
 	return fmt.Sprintf("%.2f", number)
 }
 
-func strToFloat32(str string) *float32 {
-	if str == "" {
+func strToFloat32(str *string) *float32 {
+	if str == nil || *str == "" {
 		return nil
 	}
 
-	var newFloat float32
-	if s, err := strconv.ParseFloat(str, 32); err == nil {
-		newFloat = float32(s)
+	s, err := strconv.ParseFloat(*str, 32)
+	if err != nil {
+		return nil
 	}
 
+	newFloat := float32(s)
 	return &newFloat
 }
 
