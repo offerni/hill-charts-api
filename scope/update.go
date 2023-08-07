@@ -14,6 +14,14 @@ func (svc Service) Update(
 		return nil, err
 	}
 
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+		UserID:         opts.UserID,
+	}); err != nil {
+		return nil, err
+	}
+
 	err := svc.scopeRepo.Update(ctx, hillchartsapi.ScopeUpdateOpts{
 		AccountID:      opts.AccountID,
 		Colour:         opts.Colour,
@@ -53,6 +61,7 @@ type UpdateOpts struct {
 	Name           *string
 	OrganizationID hillchartsapi.OrganizationID
 	Progress       *float32
+	UserID         hillchartsapi.UserID
 }
 
 func (opts UpdateOpts) Validate() error {

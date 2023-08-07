@@ -14,6 +14,14 @@ func (svc Service) Create(
 		return nil, err
 	}
 
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+		UserID:         opts.UserID,
+	}); err != nil {
+		return nil, err
+	}
+
 	scope, err := svc.scopeRepo.Create(ctx, hillchartsapi.ScopeCreateOpts{
 		AccountID:      opts.AccountID,
 		Colour:         opts.Colour,
@@ -45,6 +53,7 @@ type CreateOpts struct {
 	OrganizationID hillchartsapi.OrganizationID
 	Progress       float32
 	SquadID        hillchartsapi.SquadID
+	UserID         hillchartsapi.UserID
 }
 
 func (opts CreateOpts) Validate() error {
@@ -66,6 +75,41 @@ func (opts CreateOpts) Validate() error {
 
 	if opts.SquadID == "" {
 		return ErrNoSquadID
+	}
+
+	return nil
+}
+
+type ValidateUserAndOrganizationOpts struct {
+	AccountID      hillchartsapi.AccountID
+	OrganizationID hillchartsapi.OrganizationID
+	UserID         hillchartsapi.UserID
+}
+
+func (svc *Service) ValidateUserAndOrganization(
+	ctx context.Context,
+	opts ValidateUserAndOrganizationOpts,
+) error {
+
+	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
+		AccountID: opts.AccountID,
+		ID:        opts.OrganizationID,
+	})
+	if err != nil {
+		return ErrOganizationNotFound
+	}
+
+	user, err := svc.userRepo.Find(ctx, hillchartsapi.UserFindOpts{
+		AccountID:      opts.AccountID,
+		ID:             opts.UserID,
+		OrganizationID: opts.OrganizationID,
+	})
+	if err != nil {
+		return ErrUserNotFound
+	}
+
+	if user.OrganizationID != org.ID {
+		return ErrUserDoesNotBelongToOrganization
 	}
 
 	return nil

@@ -15,6 +15,14 @@ func (svc Service) Create(
 		return nil, err
 	}
 
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+		UserID:         opts.UserID,
+	}); err != nil {
+		return nil, err
+	}
+
 	squad, err := svc.squadRepo.Create(ctx, hillchartsapi.SquadCreateOpts{
 		AccountID:        opts.AccountID,
 		CurrentCycleName: opts.CurrentCycleName,
@@ -42,6 +50,7 @@ type CreateOpts struct {
 	CurrentCycleName *string
 	Name             string
 	OrganizationID   hillchartsapi.OrganizationID
+	UserID           hillchartsapi.UserID
 }
 
 func (opts CreateOpts) Validate() error {

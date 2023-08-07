@@ -66,7 +66,9 @@ func main() {
 	}
 
 	scopeSvc, err := scope.NewService(scope.NewServiceOpts{
-		ScopeRepository: scopeRepo,
+		OrganizationRepository: organizationRepo,
+		ScopeRepository:        scopeRepo,
+		UserRepository:         userRepo,
 	})
 
 	gqlResolver := graph.NewResolver(graph.NewResolverOpts{

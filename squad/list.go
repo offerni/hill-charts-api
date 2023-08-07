@@ -13,25 +13,12 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 		return nil, err
 	}
 
-	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
-		AccountID: opts.AccountID,
-		ID:        opts.OrganizationID,
-	})
-	if err != nil {
-		return nil, ErrOganizationNotFound
-	}
-
-	user, err := svc.userRepo.Find(ctx, hillchartsapi.UserFindOpts{
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
 		AccountID:      opts.AccountID,
-		ID:             opts.UserID,
 		OrganizationID: opts.OrganizationID,
-	})
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-
-	if user.OrganizationID != org.ID {
-		return nil, ErrUserDoesNotBelongToOrganization
+		UserID:         opts.UserID,
+	}); err != nil {
+		return nil, err
 	}
 
 	squadsList, err := svc.squadRepo.FindAll(ctx, hillchartsapi.SquadFindAllOpts{
@@ -110,12 +97,42 @@ func (opts ListOpts) Validate() error {
 		return hillchartsapi.ErrNoOrganizationID
 	}
 
-	if opts.SquadID == "" {
-		return hillchartsapi.ErrNoSquadID
-	}
-
 	if opts.UserID == "" {
 		return hillchartsapi.ErrNoUserID
+	}
+
+	return nil
+}
+
+type ValidateUserAndOrganizationOpts struct {
+	AccountID      hillchartsapi.AccountID
+	OrganizationID hillchartsapi.OrganizationID
+	UserID         hillchartsapi.UserID
+}
+
+func (svc *Service) ValidateUserAndOrganization(
+	ctx context.Context,
+	opts ValidateUserAndOrganizationOpts,
+) error {
+	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
+		AccountID: opts.AccountID,
+		ID:        opts.OrganizationID,
+	})
+	if err != nil {
+		return ErrOganizationNotFound
+	}
+
+	user, err := svc.userRepo.Find(ctx, hillchartsapi.UserFindOpts{
+		AccountID:      opts.AccountID,
+		ID:             opts.UserID,
+		OrganizationID: opts.OrganizationID,
+	})
+	if err != nil {
+		return ErrUserNotFound
+	}
+
+	if user.OrganizationID != org.ID {
+		return ErrUserDoesNotBelongToOrganization
 	}
 
 	return nil

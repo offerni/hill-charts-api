@@ -22,6 +22,7 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 		Name:           opts.Name,
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
 		SquadID:        hillchartsapi.SquadID(opts.SquadID),
+		UserID:         hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 
 	if err != nil {
@@ -46,6 +47,7 @@ func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad)
 		CurrentCycleName: opts.CurrentCycleName,
 		Name:             opts.Name,
 		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		UserID:           hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 
 	if err != nil {
@@ -68,6 +70,7 @@ func (r *mutationResolver) DeleteScope(ctx context.Context, id string) (bool, er
 		AccountID:      hillchartsapi.AccountID("1"),
 		ID:             hillchartsapi.ScopeID(id),
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		UserID:         hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 	if err != nil {
 		return false, err
@@ -82,6 +85,7 @@ func (r *mutationResolver) DeleteSquad(ctx context.Context, id string) (bool, er
 		AccountID:      hillchartsapi.AccountID("1"),
 		ID:             hillchartsapi.SquadID(id),
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		UserID:         hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 	if err != nil {
 		return false, err
@@ -99,6 +103,7 @@ func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *mod
 		Name:           opts.Name,
 		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
 		Progress:       strToFloat32(opts.Progress),
+		UserID:         hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 	if err != nil {
 		return nil, err
@@ -123,6 +128,7 @@ func (r *mutationResolver) UpdateSquad(ctx context.Context, id string, opts *mod
 		ID:               hillchartsapi.SquadID(id),
 		Name:             opts.Name,
 		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		UserID:           hillchartsapi.UserID(os.Getenv("TEMP_DEFAULT_USER_ID")),
 	})
 
 	if err != nil {

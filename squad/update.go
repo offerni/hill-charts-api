@@ -15,6 +15,14 @@ func (svc Service) Update(
 		return nil, err
 	}
 
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+		UserID:         opts.UserID,
+	}); err != nil {
+		return nil, err
+	}
+
 	err := svc.squadRepo.Update(ctx, hillchartsapi.SquadUpdateOpts{
 		AccountID:        opts.AccountID,
 		CurrentCycleName: opts.CurrentCycleName,
@@ -49,6 +57,7 @@ type UpdateOpts struct {
 	ID               hillchartsapi.SquadID
 	Name             *string
 	OrganizationID   hillchartsapi.OrganizationID
+	UserID           hillchartsapi.UserID
 }
 
 func (opts UpdateOpts) Validate() error {

@@ -14,6 +14,14 @@ func (svc Service) Delete(
 		return err
 	}
 
+	if err := svc.ValidateUserAndOrganization(ctx, ValidateUserAndOrganizationOpts{
+		AccountID:      opts.AccountID,
+		OrganizationID: opts.OrganizationID,
+		UserID:         opts.UserID,
+	}); err != nil {
+		return err
+	}
+
 	err := svc.scopeRepo.Delete(ctx, hillchartsapi.ScopeDeleteOpts{
 		AccountID:      opts.AccountID,
 		ID:             opts.ID,
@@ -30,6 +38,7 @@ type DeleteOpts struct {
 	AccountID      hillchartsapi.AccountID
 	ID             hillchartsapi.ScopeID
 	OrganizationID hillchartsapi.OrganizationID
+	UserID         hillchartsapi.UserID
 }
 
 func (opts DeleteOpts) Validate() error {
