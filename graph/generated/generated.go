@@ -53,16 +53,20 @@ type ComplexityRoot struct {
 	}
 
 	Scope struct {
-		Colour   func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Progress func(childComplexity int) int
-		SquadID  func(childComplexity int) int
+		Colour     func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		ModifiedAt func(childComplexity int) int
+		Name       func(childComplexity int) int
+		Progress   func(childComplexity int) int
+		SquadID    func(childComplexity int) int
 	}
 
 	Squad struct {
+		CreatedAt        func(childComplexity int) int
 		CurrentCycleName func(childComplexity int) int
 		ID               func(childComplexity int) int
+		ModifiedAt       func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Scope            func(childComplexity int) int
 	}
@@ -135,12 +139,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Scope.Colour(childComplexity), true
 
+	case "Scope.created_at":
+		if e.complexity.Scope.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Scope.CreatedAt(childComplexity), true
+
 	case "Scope.id":
 		if e.complexity.Scope.ID == nil {
 			break
 		}
 
 		return e.complexity.Scope.ID(childComplexity), true
+
+	case "Scope.modified_at":
+		if e.complexity.Scope.ModifiedAt == nil {
+			break
+		}
+
+		return e.complexity.Scope.ModifiedAt(childComplexity), true
 
 	case "Scope.name":
 		if e.complexity.Scope.Name == nil {
@@ -163,6 +181,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Scope.SquadID(childComplexity), true
 
+	case "Squad.created_at":
+		if e.complexity.Squad.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Squad.CreatedAt(childComplexity), true
+
 	case "Squad.current_cycle_name":
 		if e.complexity.Squad.CurrentCycleName == nil {
 			break
@@ -176,6 +201,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Squad.ID(childComplexity), true
+
+	case "Squad.modified_at":
+		if e.complexity.Squad.ModifiedAt == nil {
+			break
+		}
+
+		return e.complexity.Squad.ModifiedAt(childComplexity), true
 
 	case "Squad.name":
 		if e.complexity.Squad.Name == nil {
@@ -287,15 +319,19 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type Squad {
+  created_at: String
   current_cycle_name: String!
   id: String!
+  modified_at: String
   name: String!
   scope: [Scope]
 }
 
 type Scope {
   colour: String!
+  created_at: String
   id: String!
+  modified_at: String
   name: String!
   progress: String!
   squad_id: String!
@@ -312,6 +348,7 @@ type Query {
 }
 
 input NewSquad {
+  current_cycle_name: String
   name: String!
 }
 
@@ -456,10 +493,14 @@ func (ec *executionContext) fieldContext_Mutation_CreateSquad(ctx context.Contex
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "created_at":
+				return ec.fieldContext_Squad_created_at(ctx, field)
 			case "current_cycle_name":
 				return ec.fieldContext_Squad_current_cycle_name(ctx, field)
 			case "id":
 				return ec.fieldContext_Squad_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Squad_modified_at(ctx, field)
 			case "name":
 				return ec.fieldContext_Squad_name(ctx, field)
 			case "scope":
@@ -523,8 +564,12 @@ func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Contex
 			switch field.Name {
 			case "colour":
 				return ec.fieldContext_Scope_colour(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Scope_created_at(ctx, field)
 			case "id":
 				return ec.fieldContext_Scope_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Scope_modified_at(ctx, field)
 			case "name":
 				return ec.fieldContext_Scope_name(ctx, field)
 			case "progress":
@@ -771,6 +816,47 @@ func (ec *executionContext) fieldContext_Scope_colour(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Scope_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Scope) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Scope_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Scope_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Scope",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Scope_id(ctx context.Context, field graphql.CollectedField, obj *model.Scope) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Scope_id(ctx, field)
 	if err != nil {
@@ -803,6 +889,47 @@ func (ec *executionContext) _Scope_id(ctx context.Context, field graphql.Collect
 }
 
 func (ec *executionContext) fieldContext_Scope_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Scope",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Scope_modified_at(ctx context.Context, field graphql.CollectedField, obj *model.Scope) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Scope_modified_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ModifiedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Scope_modified_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Scope",
 		Field:      field,
@@ -947,6 +1074,47 @@ func (ec *executionContext) fieldContext_Scope_squad_id(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Squad_created_at(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Squad_current_cycle_name(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Squad_current_cycle_name(ctx, field)
 	if err != nil {
@@ -1023,6 +1191,47 @@ func (ec *executionContext) _Squad_id(ctx context.Context, field graphql.Collect
 }
 
 func (ec *executionContext) fieldContext_Squad_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Squad",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Squad_modified_at(ctx context.Context, field graphql.CollectedField, obj *model.Squad) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Squad_modified_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ModifiedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Squad_modified_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Squad",
 		Field:      field,
@@ -1117,8 +1326,12 @@ func (ec *executionContext) fieldContext_Squad_scope(ctx context.Context, field 
 			switch field.Name {
 			case "colour":
 				return ec.fieldContext_Scope_colour(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Scope_created_at(ctx, field)
 			case "id":
 				return ec.fieldContext_Scope_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Scope_modified_at(ctx, field)
 			case "name":
 				return ec.fieldContext_Scope_name(ctx, field)
 			case "progress":
@@ -1168,10 +1381,14 @@ func (ec *executionContext) fieldContext_SquadList_data(ctx context.Context, fie
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "created_at":
+				return ec.fieldContext_Squad_created_at(ctx, field)
 			case "current_cycle_name":
 				return ec.fieldContext_Squad_current_cycle_name(ctx, field)
 			case "id":
 				return ec.fieldContext_Squad_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Squad_modified_at(ctx, field)
 			case "name":
 				return ec.fieldContext_Squad_name(ctx, field)
 			case "scope":
@@ -3103,13 +3320,21 @@ func (ec *executionContext) unmarshalInputNewSquad(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name"}
+	fieldsInOrder := [...]string{"current_cycle_name", "name"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "current_cycle_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("current_cycle_name"))
+			it.CurrentCycleName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "name":
 			var err error
 
@@ -3259,6 +3484,10 @@ func (ec *executionContext) _Scope(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "created_at":
+
+			out.Values[i] = ec._Scope_created_at(ctx, field, obj)
+
 		case "id":
 
 			out.Values[i] = ec._Scope_id(ctx, field, obj)
@@ -3266,6 +3495,10 @@ func (ec *executionContext) _Scope(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "modified_at":
+
+			out.Values[i] = ec._Scope_modified_at(ctx, field, obj)
+
 		case "name":
 
 			out.Values[i] = ec._Scope_name(ctx, field, obj)
@@ -3308,6 +3541,10 @@ func (ec *executionContext) _Squad(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Squad")
+		case "created_at":
+
+			out.Values[i] = ec._Squad_created_at(ctx, field, obj)
+
 		case "current_cycle_name":
 
 			out.Values[i] = ec._Squad_current_cycle_name(ctx, field, obj)
@@ -3322,6 +3559,10 @@ func (ec *executionContext) _Squad(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "modified_at":
+
+			out.Values[i] = ec._Squad_modified_at(ctx, field, obj)
+
 		case "name":
 
 			out.Values[i] = ec._Squad_name(ctx, field, obj)

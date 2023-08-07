@@ -10,20 +10,25 @@ type NewScope struct {
 }
 
 type NewSquad struct {
-	Name string `json:"name"`
+	CurrentCycleName *string `json:"current_cycle_name"`
+	Name             string  `json:"name"`
 }
 
 type Scope struct {
-	Colour   string `json:"colour"`
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Progress string `json:"progress"`
-	SquadID  string `json:"squad_id"`
+	Colour     string  `json:"colour"`
+	CreatedAt  *string `json:"created_at"`
+	ID         string  `json:"id"`
+	ModifiedAt *string `json:"modified_at"`
+	Name       string  `json:"name"`
+	Progress   string  `json:"progress"`
+	SquadID    string  `json:"squad_id"`
 }
 
 type Squad struct {
+	CreatedAt        *string  `json:"created_at"`
 	CurrentCycleName string   `json:"current_cycle_name"`
 	ID               string   `json:"id"`
+	ModifiedAt       *string  `json:"modified_at"`
 	Name             string   `json:"name"`
 	Scope            []*Scope `json:"scope"`
 }

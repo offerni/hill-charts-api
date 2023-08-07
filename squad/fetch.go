@@ -11,7 +11,7 @@ type FetchResponse struct {
 	CreatedAt        time.Time
 	CurrentCycleName string
 	ID               hillchartsapi.SquadID
-	ModifieddAt      time.Time
+	ModifiedAt       time.Time
 	Name             string
 	OrganizationID   hillchartsapi.OrganizationID
 	Scopes           []*scope.FetchResponse

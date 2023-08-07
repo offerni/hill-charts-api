@@ -3,15 +3,19 @@
 # https://gqlgen.com/getting-started/
 
 type Squad {
+  created_at: String
   current_cycle_name: String!
   id: String!
+  modified_at: String
   name: String!
   scope: [Scope]
 }
 
 type Scope {
   colour: String!
+  created_at: String
   id: String!
+  modified_at: String
   name: String!
   progress: String!
   squad_id: String!
@@ -28,6 +32,7 @@ type Query {
 }
 
 input NewSquad {
+  current_cycle_name: String
   name: String!
 }
 

@@ -18,7 +18,7 @@ import (
 func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error) {
 	squad, err := r.squadSvc.Create(ctx, squad.CreateOpts{
 		AccountID:        hillchartsapi.AccountID("1"),
-		CurrentCycleName: "Some new cycle",
+		CurrentCycleName: *opts.CurrentCycleName,
 		Name:             opts.Name,
 		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
 	})
@@ -28,8 +28,10 @@ func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad)
 	}
 
 	return &model.Squad{
+		CreatedAt:        timeToStr(squad.CreatedAt),
 		CurrentCycleName: squad.CurrentCycleName,
 		ID:               string(squad.ID),
+		ModifiedAt:       timeToStr(squad.ModifiedAt),
 		Name:             squad.Name,
 		Scope:            []*model.Scope{},
 	}, nil

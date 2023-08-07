@@ -52,8 +52,10 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 		}
 
 		squads = append(squads, &FetchResponse{
-			ID:               hillchartsapi.SquadID(squad.ID),
+			CreatedAt:        squad.CreatedAt,
 			CurrentCycleName: squad.CurrentCycleName,
+			ID:               hillchartsapi.SquadID(squad.ID),
+			ModifiedAt:       squad.ModifiedAt,
 			Name:             squad.Name,
 			OrganizationID:   squad.OrganizationID,
 			Scopes:           svc.buildScopesFetchResponse(scopessList.Scopes),

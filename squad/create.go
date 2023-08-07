@@ -28,7 +28,7 @@ func (svc Service) Create(
 		CreatedAt:        squad.CreatedAt,
 		CurrentCycleName: squad.CurrentCycleName,
 		ID:               squad.ID,
-		ModifieddAt:      squad.ModifiedAt,
+		ModifiedAt:       squad.ModifiedAt,
 		Name:             squad.Name,
 		OrganizationID:   squad.OrganizationID,
 		Scopes:           []*scope.FetchResponse{},
