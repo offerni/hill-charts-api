@@ -73,11 +73,13 @@ func (svc Service) buildScopesFetchResponse(scopes []*hillchartsapi.Scope) []*sc
 	resp := []*scope.FetchResponse{}
 	for _, squad := range scopes {
 		resp = append(resp, &scope.FetchResponse{
-			Colour:   squad.Colour,
-			ID:       squad.ID,
-			Name:     squad.Name,
-			Progress: squad.Progress,
-			SquadID:  squad.SquadID,
+			Colour:     squad.Colour,
+			CreatedAt:  squad.CreatedAt,
+			ID:         squad.ID,
+			ModifiedAt: squad.ModifiedAt,
+			Name:       squad.Name,
+			Progress:   squad.Progress,
+			SquadID:    squad.SquadID,
 		})
 	}
 

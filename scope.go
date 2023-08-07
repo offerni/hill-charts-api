@@ -29,9 +29,24 @@ type ScopeCreateOpts struct {
 	SquadID        SquadID
 }
 
+type ScopeUpdateOpts struct {
+	AccountID      AccountID
+	Colour         *string
+	ID             ScopeID
+	Name           *string
+	OrganizationID OrganizationID
+	Progress       *float32
+}
+
 type ScopeList struct {
 	*PaginatedList
 	Scopes []*Scope
+}
+
+type ScopeFindOpts struct {
+	AccountID      AccountID
+	ID             ScopeID
+	OrganizationID OrganizationID
 }
 
 type ScopeFindAllOpts struct {
@@ -43,5 +58,7 @@ type ScopeFindAllOpts struct {
 
 type ScopeRepository interface {
 	Create(ctx context.Context, opts ScopeCreateOpts) (*Scope, error)
+	Find(ctx context.Context, opts ScopeFindOpts) (*Scope, error)
 	FindAll(ctx context.Context, opts ScopeFindAllOpts) (*ScopeList, error)
+	Update(ctx context.Context, opts ScopeUpdateOpts) error
 }

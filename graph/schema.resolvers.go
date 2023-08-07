@@ -75,7 +75,28 @@ func (r *mutationResolver) DeleteSquad(ctx context.Context, id *string) (bool, e
 
 // UpdateScope is the resolver for the UpdateScope field.
 func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *model.UpdateScope) (*model.Scope, error) {
-	panic(fmt.Errorf("not implemented: UpdateScope - UpdateScope"))
+
+	scope, err := r.scopeSvc.Update(ctx, scope.UpdateOpts{
+		AccountID:      hillchartsapi.AccountID("1"),
+		Colour:         opts.Colour,
+		ID:             hillchartsapi.ScopeID(id),
+		Name:           opts.Name,
+		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		Progress:       strToFloat32(*opts.Progress),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Scope{
+		Colour:     scope.Colour,
+		CreatedAt:  timeToStr(scope.CreatedAt),
+		ID:         string(scope.ID),
+		ModifiedAt: timeToStr(scope.ModifiedAt),
+		Name:       scope.Name,
+		Progress:   float32ToStr(scope.Progress),
+		SquadID:    string(scope.SquadID),
+	}, nil
 }
 
 // UpdateSquad is the resolver for the UpdateSquad field.
