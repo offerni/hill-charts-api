@@ -32,6 +32,10 @@ func timeToStr(time time.Time) *string {
 	return &formattedTime
 }
 
+func float32ToStr(number float32) string {
+	return fmt.Sprintf("%.2f", number)
+}
+
 func buildScopesResponseFromList(scopes []*scope.FetchResponse) []*model.Scope {
 	var scopesResp = []*model.Scope{}
 	for _, scope := range scopes {
@@ -39,7 +43,7 @@ func buildScopesResponseFromList(scopes []*scope.FetchResponse) []*model.Scope {
 			Colour:   scope.Colour,
 			ID:       string(scope.ID),
 			Name:     scope.Name,
-			Progress: fmt.Sprintf("%.2f", scope.Progress),
+			Progress: float32ToStr(scope.Progress),
 			SquadID:  string(scope.SquadID),
 		})
 	}

@@ -13,11 +13,12 @@ func (svc Service) Create(
 	// TODO: VALIDATION HERE
 
 	scope, err := svc.scopeRepo.Create(ctx, hillchartsapi.ScopeCreateOpts{
-		AccountID: opts.AccountID,
-		Colour:    opts.Colour,
-		Name:      opts.Name,
-		Progress:  opts.Progress,
-		SquadID:   opts.SquadID,
+		AccountID:      opts.AccountID,
+		Colour:         opts.Colour,
+		Name:           opts.Name,
+		OrganizationID: opts.OrganizationID,
+		Progress:       opts.Progress,
+		SquadID:        opts.SquadID,
 	})
 
 	if err != nil {
@@ -36,9 +37,10 @@ func (svc Service) Create(
 }
 
 type CreateOpts struct {
-	AccountID hillchartsapi.AccountID
-	Colour    string
-	Name      string
-	Progress  float32
-	SquadID   hillchartsapi.SquadID
+	AccountID      hillchartsapi.AccountID
+	Colour         string
+	Name           string
+	OrganizationID hillchartsapi.OrganizationID
+	Progress       float32
+	SquadID        hillchartsapi.SquadID
 }

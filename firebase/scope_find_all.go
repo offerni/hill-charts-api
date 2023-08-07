@@ -68,12 +68,14 @@ func (repo *scopeRepo) getScopesCollection(
 	scopeModels := []*models.Scope{}
 	for _, scope := range scopeModelMultiple {
 		scopeModels = append(scopeModels, &models.Scope{
-			AccountID: scope.AccountID,
-			Colour:    scope.Colour,
-			ID:        scope.ID,
-			Name:      scope.Name,
-			Progress:  scope.Progress,
-			SquadID:   scope.SquadID,
+			AccountID:  scope.AccountID,
+			Colour:     scope.Colour,
+			CreatedAt:  scope.CreatedAt,
+			ID:         scope.ID,
+			ModifiedAt: scope.ModifiedAt,
+			Name:       scope.Name,
+			Progress:   scope.Progress,
+			SquadID:    scope.SquadID,
 		})
 
 	}

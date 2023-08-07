@@ -355,7 +355,6 @@ input NewSquad {
 input NewScope {
   colour: String!
   name: String!
-  progress: String!
   squad_id: String!
 }
 
@@ -3268,7 +3267,7 @@ func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"colour", "name", "progress", "squad_id"}
+	fieldsInOrder := [...]string{"colour", "name", "squad_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3288,14 +3287,6 @@ func (ec *executionContext) unmarshalInputNewScope(ctx context.Context, obj inte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "progress":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("progress"))
-			it.Progress, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

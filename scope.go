@@ -21,11 +21,12 @@ type Scope struct {
 }
 
 type ScopeCreateOpts struct {
-	AccountID AccountID
-	Colour    string
-	Name      string
-	Progress  float32
-	SquadID   SquadID
+	AccountID      AccountID
+	Colour         string
+	Name           string
+	OrganizationID OrganizationID
+	Progress       float32
+	SquadID        SquadID
 }
 
 type ScopeList struct {

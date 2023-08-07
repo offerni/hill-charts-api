@@ -40,10 +40,11 @@ func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad)
 // CreateScope is the resolver for the CreateScope field.
 func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope) (*model.Scope, error) {
 	scope, err := r.scopeSvc.Create(ctx, scope.CreateOpts{
-		AccountID: hillchartsapi.AccountID("1"),
-		Colour:    opts.Colour,
-		Name:      opts.Name,
-		SquadID:   hillchartsapi.SquadID(opts.SquadID),
+		AccountID:      hillchartsapi.AccountID("1"),
+		Colour:         opts.Colour,
+		Name:           opts.Name,
+		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+		SquadID:        hillchartsapi.SquadID(opts.SquadID),
 	})
 
 	if err != nil {
@@ -51,13 +52,13 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 	}
 
 	return &model.Scope{
-		Colour:     opts.Colour,
+		Colour:     scope.Colour,
 		CreatedAt:  timeToStr(scope.CreatedAt),
 		ID:         string(scope.ID),
 		ModifiedAt: timeToStr(scope.ModifiedAt),
 		Name:       scope.Name,
-		Progress:   opts.Progress,
-		SquadID:    opts.Progress,
+		Progress:   float32ToStr(scope.Progress),
+		SquadID:    string(scope.SquadID),
 	}, nil
 }
 

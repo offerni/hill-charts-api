@@ -39,7 +39,6 @@ input NewSquad {
 input NewScope {
   colour: String!
   name: String!
-  progress: String!
   squad_id: String!
 }
 

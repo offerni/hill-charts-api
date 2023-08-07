@@ -3,10 +3,9 @@
 package model
 
 type NewScope struct {
-	Colour   string `json:"colour"`
-	Name     string `json:"name"`
-	Progress string `json:"progress"`
-	SquadID  string `json:"squad_id"`
+	Colour  string `json:"colour"`
+	Name    string `json:"name"`
+	SquadID string `json:"squad_id"`
 }
 
 type NewSquad struct {

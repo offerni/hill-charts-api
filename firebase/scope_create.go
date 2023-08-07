@@ -27,7 +27,7 @@ func (repo scopeRepo) addDocWithoutID(
 	ctx context.Context,
 	opts hillchartsapi.ScopeCreateOpts,
 ) (*models.Scope, error) {
-	path := fmt.Sprintf("squads/%s", opts.SquadID)
+	path := fmt.Sprintf("organizations/%s/squads/%s", opts.OrganizationID, opts.SquadID)
 	id := newPrefixedUUID(hillchartsapi.ScopeIDPrefix)
 
 	currentTime := time.Now()
