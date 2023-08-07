@@ -71,15 +71,15 @@ func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, err
 
 func (svc Service) buildScopesFetchResponse(scopes []*hillchartsapi.Scope) []*scope.FetchResponse {
 	resp := []*scope.FetchResponse{}
-	for _, squad := range scopes {
+	for _, s := range scopes {
 		resp = append(resp, &scope.FetchResponse{
-			Colour:     squad.Colour,
-			CreatedAt:  squad.CreatedAt,
-			ID:         squad.ID,
-			ModifiedAt: squad.ModifiedAt,
-			Name:       squad.Name,
-			Progress:   squad.Progress,
-			SquadID:    squad.SquadID,
+			Colour:     s.Colour,
+			CreatedAt:  s.CreatedAt,
+			ID:         s.ID,
+			ModifiedAt: s.ModifiedAt,
+			Name:       s.Name,
+			Progress:   s.Progress,
+			SquadID:    s.SquadID,
 		})
 	}
 
