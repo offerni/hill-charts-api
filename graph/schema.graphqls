@@ -31,18 +31,33 @@ type Query {
   Squads: SquadList
 }
 
-input NewSquad {
-  current_cycle_name: String
-  name: String!
-}
-
 input NewScope {
   colour: String!
   name: String!
   squad_id: String!
 }
 
+input NewSquad {
+  current_cycle_name: String
+  name: String!
+}
+
+input UpdateSquad {
+  current_cycle_name: String
+  name: String
+}
+
+input UpdateScope {
+  colour: String
+  name: String
+  progress: String
+}
+
 type Mutation {
-  CreateSquad(opts: NewSquad!): Squad!
   CreateScope(opts: NewScope!): Scope!
+  CreateSquad(opts: NewSquad!): Squad!
+  DeleteScope(id: String): Boolean!
+  DeleteSquad(id: String): Boolean!
+  UpdateScope(id: String!, opts: UpdateScope): Scope!
+  UpdateSquad(id: String!, opts: UpdateSquad): Squad!
 }

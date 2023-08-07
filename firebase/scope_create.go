@@ -15,7 +15,7 @@ func (repo *scopeRepo) Create(
 	opts hillchartsapi.ScopeCreateOpts,
 ) (*hillchartsapi.Scope, error) {
 
-	resp, err := repo.addDocWithoutID(ctx, opts)
+	resp, err := repo.insertRecord(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (repo *scopeRepo) Create(
 	return models.ConvertScopeModelToDomain(resp), nil
 }
 
-func (repo scopeRepo) addDocWithoutID(
+func (repo scopeRepo) insertRecord(
 	ctx context.Context,
 	opts hillchartsapi.ScopeCreateOpts,
 ) (*models.Scope, error) {

@@ -15,7 +15,7 @@ func (repo *squadRepo) Create(
 	opts hillchartsapi.SquadCreateOpts,
 ) (*hillchartsapi.Squad, error) {
 
-	resp, err := repo.addDocWithoutID(ctx, opts)
+	resp, err := repo.insertRecord(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (repo *squadRepo) Create(
 	return models.ConvertSquadModelToDomain(resp), nil
 }
 
-func (repo squadRepo) addDocWithoutID(
+func (repo squadRepo) insertRecord(
 	ctx context.Context,
 	opts hillchartsapi.SquadCreateOpts,
 ) (*models.Squad, error) {
