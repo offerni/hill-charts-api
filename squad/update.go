@@ -4,6 +4,7 @@ import (
 	"context"
 
 	hillchartsapi "github.com/offerni/hill-charts-api"
+	"github.com/offerni/hill-charts-api/scope"
 )
 
 func (svc Service) Update(
@@ -13,8 +14,9 @@ func (svc Service) Update(
 	// TODO: VALIDATION HERE
 
 	err := svc.squadRepo.Update(ctx, hillchartsapi.SquadUpdateOpts{
-		CurrentCycleName: &opts.CurrentCycleName,
-		Name:             &opts.Name,
+		CurrentCycleName: opts.CurrentCycleName,
+		ID:               opts.ID,
+		Name:             opts.Name,
 		OrganizationID:   opts.OrganizationID,
 	})
 	if err != nil {
@@ -34,13 +36,14 @@ func (svc Service) Update(
 		ModifiedAt:       squad.ModifiedAt,
 		Name:             squad.Name,
 		OrganizationID:   squad.OrganizationID,
+		Scopes:           []*scope.FetchResponse{},
 	}, nil
 }
 
 type UpdateOpts struct {
 	AccountID        hillchartsapi.AccountID
-	CurrentCycleName string
+	CurrentCycleName *string
 	ID               hillchartsapi.SquadID
-	Name             string
+	Name             *string
 	OrganizationID   hillchartsapi.OrganizationID
 }

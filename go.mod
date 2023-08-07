@@ -5,6 +5,7 @@ go 1.20
 require (
 	cloud.google.com/go/firestore v1.12.0
 	github.com/99designs/gqlgen v0.17.16
+	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v1.5.4
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1

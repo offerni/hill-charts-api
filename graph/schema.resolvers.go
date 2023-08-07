@@ -80,7 +80,26 @@ func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *mod
 
 // UpdateSquad is the resolver for the UpdateSquad field.
 func (r *mutationResolver) UpdateSquad(ctx context.Context, id string, opts *model.UpdateSquad) (*model.Squad, error) {
-	panic(fmt.Errorf("not implemented: UpdateSquad - UpdateSquad"))
+	squad, err := r.squadSvc.Update(ctx, squad.UpdateOpts{
+		AccountID:        hillchartsapi.AccountID("1"),
+		CurrentCycleName: opts.CurrentCycleName,
+		ID:               hillchartsapi.SquadID(id),
+		Name:             opts.Name,
+		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Squad{
+		CreatedAt:        timeToStr(squad.CreatedAt),
+		CurrentCycleName: squad.CurrentCycleName,
+		ID:               string(squad.ID),
+		ModifiedAt:       timeToStr(squad.ModifiedAt),
+		Name:             squad.Name,
+		Scope:            []*model.Scope{},
+	}, nil
 }
 
 // Squads is the resolver for the Squads field.
