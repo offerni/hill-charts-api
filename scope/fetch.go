@@ -1,11 +1,17 @@
 package scope
 
-import hillchartsapi "github.com/offerni/hill-charts-api"
+import (
+	"time"
+
+	hillchartsapi "github.com/offerni/hill-charts-api"
+)
 
 type FetchResponse struct {
-	Colour   string
-	ID       hillchartsapi.ScopeID
-	Name     string
-	Progress float32
-	SquadID  hillchartsapi.SquadID
+	Colour     string
+	CreatedAt  time.Time
+	ID         hillchartsapi.ScopeID
+	ModifiedAt time.Time
+	Name       string
+	Progress   float32
+	SquadID    hillchartsapi.SquadID
 }

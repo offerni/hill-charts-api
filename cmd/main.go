@@ -17,6 +17,7 @@ import (
 	"github.com/offerni/hill-charts-api/firebase"
 	"github.com/offerni/hill-charts-api/graph"
 	"github.com/offerni/hill-charts-api/graph/generated"
+	"github.com/offerni/hill-charts-api/scope"
 	"github.com/offerni/hill-charts-api/squad"
 	"github.com/rs/cors"
 	"google.golang.org/api/option"
@@ -64,7 +65,12 @@ func main() {
 		hcerrors.Wrap("squad.NewService", err)
 	}
 
+	scopeSvc, err := scope.NewService(scope.NewServiceOpts{
+		ScopeRepository: scopeRepo,
+	})
+
 	gqlResolver := graph.NewResolver(graph.NewResolverOpts{
+		ScopeService: scopeSvc,
 		SquadService: squadSvc,
 	})
 

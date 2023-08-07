@@ -1,18 +1,23 @@
 package hillchartsapi
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type ScopeID string
 
 const ScopeIDPrefix = "scp"
 
 type Scope struct {
-	AccountID AccountID
-	Colour    string
-	ID        ScopeID
-	Name      string
-	Progress  float32
-	SquadID   SquadID
+	AccountID  AccountID
+	Colour     string
+	CreatedAt  time.Time
+	ID         ScopeID
+	ModifiedAt time.Time
+	Name       string
+	Progress   float32
+	SquadID    SquadID
 }
 
 type ScopeCreateOpts struct {
@@ -20,6 +25,7 @@ type ScopeCreateOpts struct {
 	Colour    string
 	Name      string
 	Progress  float32
+	SquadID   SquadID
 }
 
 type ScopeList struct {
@@ -35,6 +41,6 @@ type ScopeFindAllOpts struct {
 }
 
 type ScopeRepository interface {
-	// Create(ctx context.Context, opts ScopeCreateOpts) (*Scope, error)
+	Create(ctx context.Context, opts ScopeCreateOpts) (*Scope, error)
 	FindAll(ctx context.Context, opts ScopeFindAllOpts) (*ScopeList, error)
 }
