@@ -4,7 +4,7 @@
 
 type Squad {
   created_at: String
-  current_cycle_name: String!
+  current_cycle_name: String
   id: String!
   modified_at: String
   name: String!

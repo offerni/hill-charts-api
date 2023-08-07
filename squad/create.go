@@ -11,7 +11,9 @@ func (svc Service) Create(
 	ctx context.Context,
 	opts CreateOpts,
 ) (*FetchResponse, error) {
-	// TODO: VALIDATION HERE
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 
 	squad, err := svc.squadRepo.Create(ctx, hillchartsapi.SquadCreateOpts{
 		AccountID:        opts.AccountID,
@@ -37,7 +39,23 @@ func (svc Service) Create(
 
 type CreateOpts struct {
 	AccountID        hillchartsapi.AccountID
-	CurrentCycleName string
+	CurrentCycleName *string
 	Name             string
 	OrganizationID   hillchartsapi.OrganizationID
+}
+
+func (opts CreateOpts) Validate() error {
+	if opts.AccountID == "" {
+		return ErrNoAccountID
+	}
+
+	if opts.OrganizationID == "" {
+		return ErrNoName
+	}
+
+	if opts.Name == "" {
+		return ErrNoName
+	}
+
+	return nil
 }

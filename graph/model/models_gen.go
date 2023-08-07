@@ -25,7 +25,7 @@ type Scope struct {
 
 type Squad struct {
 	CreatedAt        *string  `json:"created_at"`
-	CurrentCycleName string   `json:"current_cycle_name"`
+	CurrentCycleName *string  `json:"current_cycle_name"`
 	ID               string   `json:"id"`
 	ModifiedAt       *string  `json:"modified_at"`
 	Name             string   `json:"name"`

@@ -10,7 +10,9 @@ func (svc Service) Update(
 	ctx context.Context,
 	opts UpdateOpts,
 ) (*FetchResponse, error) {
-	// TODO: VALIDATION HERE
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 
 	err := svc.scopeRepo.Update(ctx, hillchartsapi.ScopeUpdateOpts{
 		AccountID:      opts.AccountID,
@@ -51,4 +53,20 @@ type UpdateOpts struct {
 	Name           *string
 	OrganizationID hillchartsapi.OrganizationID
 	Progress       *float32
+}
+
+func (opts UpdateOpts) Validate() error {
+	if opts.AccountID == "" {
+		return hillchartsapi.ErrNoAccountID
+	}
+
+	if opts.OrganizationID == "" {
+		return ErrNoOrganizationID
+	}
+
+	if opts.ID == "" {
+		return ErrNoID
+	}
+
+	return nil
 }

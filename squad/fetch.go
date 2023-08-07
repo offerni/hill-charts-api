@@ -9,7 +9,7 @@ import (
 
 type FetchResponse struct {
 	CreatedAt        time.Time
-	CurrentCycleName string
+	CurrentCycleName *string
 	ID               hillchartsapi.SquadID
 	ModifiedAt       time.Time
 	Name             string

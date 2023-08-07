@@ -43,7 +43,7 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error) {
 	squad, err := r.squadSvc.Create(ctx, squad.CreateOpts{
 		AccountID:        hillchartsapi.AccountID("1"),
-		CurrentCycleName: *opts.CurrentCycleName,
+		CurrentCycleName: opts.CurrentCycleName,
 		Name:             opts.Name,
 		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
 	})

@@ -12,7 +12,7 @@ const SquadIDPrefix = "sqd"
 type Squad struct {
 	AccountID        AccountID
 	CreatedAt        time.Time
-	CurrentCycleName string
+	CurrentCycleName *string
 	ID               SquadID
 	ModifiedAt       time.Time
 	Name             string
@@ -21,7 +21,7 @@ type Squad struct {
 
 type SquadCreateOpts struct {
 	AccountID        AccountID
-	CurrentCycleName string
+	CurrentCycleName *string
 	Name             string
 	OrganizationID   OrganizationID
 }

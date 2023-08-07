@@ -9,7 +9,9 @@ import (
 )
 
 func (svc *Service) List(ctx context.Context, opts ListOpts) (*ListResponse, error) {
-	// TODO: implement validation here
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 
 	org, err := svc.organizationRepo.Find(ctx, hillchartsapi.OrganizationFindOpts{
 		AccountID: opts.AccountID,
@@ -97,4 +99,24 @@ type ListResponse struct {
 	Data       []*FetchResponse
 	HasMore    bool
 	TotalCount int
+}
+
+func (opts ListOpts) Validate() error {
+	if opts.AccountID == "" {
+		return hillchartsapi.ErrNoAccountID
+	}
+
+	if opts.OrganizationID == "" {
+		return hillchartsapi.ErrNoOrganizationID
+	}
+
+	if opts.SquadID == "" {
+		return hillchartsapi.ErrNoSquadID
+	}
+
+	if opts.UserID == "" {
+		return hillchartsapi.ErrNoUserID
+	}
+
+	return nil
 }

@@ -9,7 +9,7 @@ import (
 type Squad struct {
 	AccountID        string     `firestore:"account_id"`
 	CreatedAt        *time.Time `firestore:"created_at"`
-	CurrentCycleName string     `firestore:"current_cycle_name"`
+	CurrentCycleName *string    `firestore:"current_cycle_name"`
 	ID               string     `firestore:"id"`
 	ModifiedAt       *time.Time `firestore:"modified_at"`
 	Name             string     `firestore:"name"`

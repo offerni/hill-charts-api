@@ -10,7 +10,9 @@ func (svc Service) Create(
 	ctx context.Context,
 	opts CreateOpts,
 ) (*FetchResponse, error) {
-	// TODO: VALIDATION HERE
+	if err := opts.Validate(); err != nil {
+		return nil, err
+	}
 
 	scope, err := svc.scopeRepo.Create(ctx, hillchartsapi.ScopeCreateOpts{
 		AccountID:      opts.AccountID,
@@ -43,4 +45,28 @@ type CreateOpts struct {
 	OrganizationID hillchartsapi.OrganizationID
 	Progress       float32
 	SquadID        hillchartsapi.SquadID
+}
+
+func (opts CreateOpts) Validate() error {
+	if opts.AccountID == "" {
+		return hillchartsapi.ErrNoAccountID
+	}
+
+	if opts.Colour == "" {
+		return ErrNoColour
+	}
+
+	if opts.Name == "" {
+		return ErrNoName
+	}
+
+	if opts.OrganizationID == "" {
+		return ErrNoOrganizationID
+	}
+
+	if opts.SquadID == "" {
+		return ErrNoSquadID
+	}
+
+	return nil
 }
