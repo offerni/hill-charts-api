@@ -46,6 +46,10 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateScope func(childComplexity int, opts model.NewScope) int
 		CreateSquad func(childComplexity int, opts model.NewSquad) int
+		DeleteScope func(childComplexity int, id *string) int
+		DeleteSquad func(childComplexity int, id *string) int
+		UpdateScope func(childComplexity int, id string, opts *model.UpdateScope) int
+		UpdateSquad func(childComplexity int, id string, opts *model.UpdateSquad) int
 	}
 
 	Query struct {
@@ -79,8 +83,12 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error)
 	CreateScope(ctx context.Context, opts model.NewScope) (*model.Scope, error)
+	CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error)
+	DeleteScope(ctx context.Context, id *string) (bool, error)
+	DeleteSquad(ctx context.Context, id *string) (bool, error)
+	UpdateScope(ctx context.Context, id string, opts *model.UpdateScope) (*model.Scope, error)
+	UpdateSquad(ctx context.Context, id string, opts *model.UpdateSquad) (*model.Squad, error)
 }
 type QueryResolver interface {
 	Squads(ctx context.Context) (*model.SquadList, error)
@@ -124,6 +132,54 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateSquad(childComplexity, args["opts"].(model.NewSquad)), true
+
+	case "Mutation.DeleteScope":
+		if e.complexity.Mutation.DeleteScope == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_DeleteScope_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteScope(childComplexity, args["id"].(*string)), true
+
+	case "Mutation.DeleteSquad":
+		if e.complexity.Mutation.DeleteSquad == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_DeleteSquad_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteSquad(childComplexity, args["id"].(*string)), true
+
+	case "Mutation.UpdateScope":
+		if e.complexity.Mutation.UpdateScope == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateScope_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateScope(childComplexity, args["id"].(string), args["opts"].(*model.UpdateScope)), true
+
+	case "Mutation.UpdateSquad":
+		if e.complexity.Mutation.UpdateSquad == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_UpdateSquad_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSquad(childComplexity, args["id"].(string), args["opts"].(*model.UpdateSquad)), true
 
 	case "Query.Squads":
 		if e.complexity.Query.Squads == nil {
@@ -254,6 +310,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewScope,
 		ec.unmarshalInputNewSquad,
+		ec.unmarshalInputUpdateScope,
+		ec.unmarshalInputUpdateSquad,
 	)
 	first := true
 
@@ -347,20 +405,35 @@ type Query {
   Squads: SquadList
 }
 
-input NewSquad {
-  current_cycle_name: String
-  name: String!
-}
-
 input NewScope {
   colour: String!
   name: String!
   squad_id: String!
 }
 
+input NewSquad {
+  current_cycle_name: String
+  name: String!
+}
+
+input UpdateSquad {
+  current_cycle_name: String
+  name: String
+}
+
+input UpdateScope {
+  colour: String
+  name: String
+  progress: String
+}
+
 type Mutation {
-  CreateSquad(opts: NewSquad!): Squad!
   CreateScope(opts: NewScope!): Scope!
+  CreateSquad(opts: NewSquad!): Squad!
+  DeleteScope(id: String): Boolean!
+  DeleteSquad(id: String): Boolean!
+  UpdateScope(id: String!, opts: UpdateScope): Scope!
+  UpdateSquad(id: String!, opts: UpdateSquad): Squad!
 }
 `, BuiltIn: false},
 }
@@ -397,6 +470,84 @@ func (ec *executionContext) field_Mutation_CreateSquad_args(ctx context.Context,
 		}
 	}
 	args["opts"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_DeleteScope_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_DeleteSquad_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_UpdateScope_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *model.UpdateScope
+	if tmp, ok := rawArgs["opts"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("opts"))
+		arg1, err = ec.unmarshalOUpdateScope2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐUpdateScope(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["opts"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_UpdateSquad_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 *model.UpdateSquad
+	if tmp, ok := rawArgs["opts"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("opts"))
+		arg1, err = ec.unmarshalOUpdateSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐUpdateSquad(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["opts"] = arg1
 	return args, nil
 }
 
@@ -452,6 +603,77 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Mutation_CreateScope(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_CreateScope(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateScope(rctx, fc.Args["opts"].(model.NewScope))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Scope)
+	fc.Result = res
+	return ec.marshalNScope2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "colour":
+				return ec.fieldContext_Scope_colour(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Scope_created_at(ctx, field)
+			case "id":
+				return ec.fieldContext_Scope_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Scope_modified_at(ctx, field)
+			case "name":
+				return ec.fieldContext_Scope_name(ctx, field)
+			case "progress":
+				return ec.fieldContext_Scope_progress(ctx, field)
+			case "squad_id":
+				return ec.fieldContext_Scope_squad_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Scope", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_CreateScope_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Mutation_CreateSquad(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_CreateSquad(ctx, field)
@@ -522,8 +744,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateSquad(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_CreateScope(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_CreateScope(ctx, field)
+func (ec *executionContext) _Mutation_DeleteScope(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_DeleteScope(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -536,7 +758,117 @@ func (ec *executionContext) _Mutation_CreateScope(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateScope(rctx, fc.Args["opts"].(model.NewScope))
+		return ec.resolvers.Mutation().DeleteScope(rctx, fc.Args["id"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_DeleteScope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_DeleteScope_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_DeleteSquad(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_DeleteSquad(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteSquad(rctx, fc.Args["id"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_DeleteSquad(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_DeleteSquad_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_UpdateScope(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_UpdateScope(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateScope(rctx, fc.Args["id"].(string), fc.Args["opts"].(*model.UpdateScope))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -553,7 +885,7 @@ func (ec *executionContext) _Mutation_CreateScope(ctx context.Context, field gra
 	return ec.marshalNScope2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐScope(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_UpdateScope(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -586,7 +918,76 @@ func (ec *executionContext) fieldContext_Mutation_CreateScope(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_CreateScope_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_UpdateScope_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_UpdateSquad(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_UpdateSquad(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSquad(rctx, fc.Args["id"].(string), fc.Args["opts"].(*model.UpdateSquad))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Squad)
+	fc.Result = res
+	return ec.marshalNSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐSquad(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_UpdateSquad(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "created_at":
+				return ec.fieldContext_Squad_created_at(ctx, field)
+			case "current_cycle_name":
+				return ec.fieldContext_Squad_current_cycle_name(ctx, field)
+			case "id":
+				return ec.fieldContext_Squad_id(ctx, field)
+			case "modified_at":
+				return ec.fieldContext_Squad_modified_at(ctx, field)
+			case "name":
+				return ec.fieldContext_Squad_name(ctx, field)
+			case "scope":
+				return ec.fieldContext_Squad_scope(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Squad", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_UpdateSquad_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3340,6 +3741,86 @@ func (ec *executionContext) unmarshalInputNewSquad(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateScope(ctx context.Context, obj interface{}) (model.UpdateScope, error) {
+	var it model.UpdateScope
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"colour", "name", "progress"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "colour":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("colour"))
+			it.Colour, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "progress":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("progress"))
+			it.Progress, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateSquad(ctx context.Context, obj interface{}) (model.UpdateSquad, error) {
+	var it model.UpdateSquad
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"current_cycle_name", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "current_cycle_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("current_cycle_name"))
+			it.CurrentCycleName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3367,6 +3848,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "CreateScope":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_CreateScope(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "CreateSquad":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -3376,10 +3866,37 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "CreateScope":
+		case "DeleteScope":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_CreateScope(ctx, field)
+				return ec._Mutation_DeleteScope(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "DeleteSquad":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_DeleteSquad(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "UpdateScope":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_UpdateScope(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "UpdateSquad":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_UpdateSquad(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -4412,6 +4929,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUpdateScope2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐUpdateScope(ctx context.Context, v interface{}) (*model.UpdateScope, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateScope(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUpdateSquad2ᚖgithubᚗcomᚋofferniᚋhillᚑchartsᚑapiᚋgraphᚋmodelᚐUpdateSquad(ctx context.Context, v interface{}) (*model.UpdateSquad, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateSquad(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

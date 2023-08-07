@@ -37,3 +37,14 @@ type SquadList struct {
 	HasMore    bool     `json:"has_more"`
 	TotalCount int      `json:"total_count"`
 }
+
+type UpdateScope struct {
+	Colour   *string `json:"colour"`
+	Name     *string `json:"name"`
+	Progress *string `json:"progress"`
+}
+
+type UpdateSquad struct {
+	CurrentCycleName *string `json:"current_cycle_name"`
+	Name             *string `json:"name"`
+}

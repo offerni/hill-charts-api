@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	hillchartsapi "github.com/offerni/hill-charts-api"
@@ -13,29 +14,6 @@ import (
 	"github.com/offerni/hill-charts-api/scope"
 	"github.com/offerni/hill-charts-api/squad"
 )
-
-// CreateSquad is the resolver for the CreateSquad field.
-func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error) {
-	squad, err := r.squadSvc.Create(ctx, squad.CreateOpts{
-		AccountID:        hillchartsapi.AccountID("1"),
-		CurrentCycleName: *opts.CurrentCycleName,
-		Name:             opts.Name,
-		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &model.Squad{
-		CreatedAt:        timeToStr(squad.CreatedAt),
-		CurrentCycleName: squad.CurrentCycleName,
-		ID:               string(squad.ID),
-		ModifiedAt:       timeToStr(squad.ModifiedAt),
-		Name:             squad.Name,
-		Scope:            []*model.Scope{},
-	}, nil
-}
 
 // CreateScope is the resolver for the CreateScope field.
 func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope) (*model.Scope, error) {
@@ -60,6 +38,49 @@ func (r *mutationResolver) CreateScope(ctx context.Context, opts model.NewScope)
 		Progress:   float32ToStr(scope.Progress),
 		SquadID:    string(scope.SquadID),
 	}, nil
+}
+
+// CreateSquad is the resolver for the CreateSquad field.
+func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error) {
+	squad, err := r.squadSvc.Create(ctx, squad.CreateOpts{
+		AccountID:        hillchartsapi.AccountID("1"),
+		CurrentCycleName: *opts.CurrentCycleName,
+		Name:             opts.Name,
+		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Squad{
+		CreatedAt:        timeToStr(squad.CreatedAt),
+		CurrentCycleName: squad.CurrentCycleName,
+		ID:               string(squad.ID),
+		ModifiedAt:       timeToStr(squad.ModifiedAt),
+		Name:             squad.Name,
+		Scope:            []*model.Scope{},
+	}, nil
+}
+
+// DeleteScope is the resolver for the DeleteScope field.
+func (r *mutationResolver) DeleteScope(ctx context.Context, id *string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteScope - DeleteScope"))
+}
+
+// DeleteSquad is the resolver for the DeleteSquad field.
+func (r *mutationResolver) DeleteSquad(ctx context.Context, id *string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteSquad - DeleteSquad"))
+}
+
+// UpdateScope is the resolver for the UpdateScope field.
+func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *model.UpdateScope) (*model.Scope, error) {
+	panic(fmt.Errorf("not implemented: UpdateScope - UpdateScope"))
+}
+
+// UpdateSquad is the resolver for the UpdateSquad field.
+func (r *mutationResolver) UpdateSquad(ctx context.Context, id string, opts *model.UpdateSquad) (*model.Squad, error) {
+	panic(fmt.Errorf("not implemented: UpdateSquad - UpdateSquad"))
 }
 
 // Squads is the resolver for the Squads field.
