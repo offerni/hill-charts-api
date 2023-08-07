@@ -46,8 +46,8 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateScope func(childComplexity int, opts model.NewScope) int
 		CreateSquad func(childComplexity int, opts model.NewSquad) int
-		DeleteScope func(childComplexity int, id *string) int
-		DeleteSquad func(childComplexity int, id *string) int
+		DeleteScope func(childComplexity int, id string) int
+		DeleteSquad func(childComplexity int, id string) int
 		UpdateScope func(childComplexity int, id string, opts *model.UpdateScope) int
 		UpdateSquad func(childComplexity int, id string, opts *model.UpdateSquad) int
 	}
@@ -85,8 +85,8 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateScope(ctx context.Context, opts model.NewScope) (*model.Scope, error)
 	CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error)
-	DeleteScope(ctx context.Context, id *string) (bool, error)
-	DeleteSquad(ctx context.Context, id *string) (bool, error)
+	DeleteScope(ctx context.Context, id string) (bool, error)
+	DeleteSquad(ctx context.Context, id string) (bool, error)
 	UpdateScope(ctx context.Context, id string, opts *model.UpdateScope) (*model.Scope, error)
 	UpdateSquad(ctx context.Context, id string, opts *model.UpdateSquad) (*model.Squad, error)
 }
@@ -143,7 +143,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteScope(childComplexity, args["id"].(*string)), true
+		return e.complexity.Mutation.DeleteScope(childComplexity, args["id"].(string)), true
 
 	case "Mutation.DeleteSquad":
 		if e.complexity.Mutation.DeleteSquad == nil {
@@ -155,7 +155,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteSquad(childComplexity, args["id"].(*string)), true
+		return e.complexity.Mutation.DeleteSquad(childComplexity, args["id"].(string)), true
 
 	case "Mutation.UpdateScope":
 		if e.complexity.Mutation.UpdateScope == nil {
@@ -430,8 +430,8 @@ input UpdateScope {
 type Mutation {
   CreateScope(opts: NewScope!): Scope!
   CreateSquad(opts: NewSquad!): Squad!
-  DeleteScope(id: String): Boolean!
-  DeleteSquad(id: String): Boolean!
+  DeleteScope(id: String!): Boolean!
+  DeleteSquad(id: String!): Boolean!
   UpdateScope(id: String!, opts: UpdateScope): Scope!
   UpdateSquad(id: String!, opts: UpdateSquad): Squad!
 }
@@ -476,10 +476,10 @@ func (ec *executionContext) field_Mutation_CreateSquad_args(ctx context.Context,
 func (ec *executionContext) field_Mutation_DeleteScope_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -491,10 +491,10 @@ func (ec *executionContext) field_Mutation_DeleteScope_args(ctx context.Context,
 func (ec *executionContext) field_Mutation_DeleteSquad_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -758,7 +758,7 @@ func (ec *executionContext) _Mutation_DeleteScope(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteScope(rctx, fc.Args["id"].(*string))
+		return ec.resolvers.Mutation().DeleteScope(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -813,7 +813,7 @@ func (ec *executionContext) _Mutation_DeleteSquad(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSquad(rctx, fc.Args["id"].(*string))
+		return ec.resolvers.Mutation().DeleteSquad(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

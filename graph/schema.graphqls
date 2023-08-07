@@ -56,8 +56,8 @@ input UpdateScope {
 type Mutation {
   CreateScope(opts: NewScope!): Scope!
   CreateSquad(opts: NewSquad!): Squad!
-  DeleteScope(id: String): Boolean!
-  DeleteSquad(id: String): Boolean!
+  DeleteScope(id: String!): Boolean!
+  DeleteSquad(id: String!): Boolean!
   UpdateScope(id: String!, opts: UpdateScope): Scope!
   UpdateSquad(id: String!, opts: UpdateSquad): Squad!
 }

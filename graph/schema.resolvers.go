@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	hillchartsapi "github.com/offerni/hill-charts-api"
@@ -64,18 +63,35 @@ func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad)
 }
 
 // DeleteScope is the resolver for the DeleteScope field.
-func (r *mutationResolver) DeleteScope(ctx context.Context, id *string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteScope - DeleteScope"))
+func (r *mutationResolver) DeleteScope(ctx context.Context, id string) (bool, error) {
+	err := r.scopeSvc.Delete(ctx, scope.DeleteOpts{
+		AccountID:      hillchartsapi.AccountID("1"),
+		ID:             hillchartsapi.ScopeID(id),
+		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // DeleteSquad is the resolver for the DeleteSquad field.
-func (r *mutationResolver) DeleteSquad(ctx context.Context, id *string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteSquad - DeleteSquad"))
+func (r *mutationResolver) DeleteSquad(ctx context.Context, id string) (bool, error) {
+	err := r.squadSvc.Delete(ctx, squad.DeleteOpts{
+		AccountID:      hillchartsapi.AccountID("1"),
+		ID:             hillchartsapi.SquadID(id),
+		OrganizationID: hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // UpdateScope is the resolver for the UpdateScope field.
 func (r *mutationResolver) UpdateScope(ctx context.Context, id string, opts *model.UpdateScope) (*model.Scope, error) {
-
 	scope, err := r.scopeSvc.Update(ctx, scope.UpdateOpts{
 		AccountID:      hillchartsapi.AccountID("1"),
 		Colour:         opts.Colour,

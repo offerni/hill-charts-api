@@ -14,6 +14,7 @@ func (svc Service) Update(
 	// TODO: VALIDATION HERE
 
 	err := svc.squadRepo.Update(ctx, hillchartsapi.SquadUpdateOpts{
+		AccountID:        opts.AccountID,
 		CurrentCycleName: opts.CurrentCycleName,
 		ID:               opts.ID,
 		Name:             opts.Name,

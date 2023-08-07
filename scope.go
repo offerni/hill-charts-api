@@ -38,6 +38,12 @@ type ScopeUpdateOpts struct {
 	Progress       *float32
 }
 
+type ScopeDeleteOpts struct {
+	AccountID      AccountID
+	ID             ScopeID
+	OrganizationID OrganizationID
+}
+
 type ScopeList struct {
 	*PaginatedList
 	Scopes []*Scope
@@ -58,6 +64,7 @@ type ScopeFindAllOpts struct {
 
 type ScopeRepository interface {
 	Create(ctx context.Context, opts ScopeCreateOpts) (*Scope, error)
+	Delete(ctx context.Context, opts ScopeDeleteOpts) error
 	Find(ctx context.Context, opts ScopeFindOpts) (*Scope, error)
 	FindAll(ctx context.Context, opts ScopeFindAllOpts) (*ScopeList, error)
 	Update(ctx context.Context, opts ScopeUpdateOpts) error
