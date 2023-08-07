@@ -16,7 +16,23 @@ import (
 
 // CreateSquad is the resolver for the CreateSquad field.
 func (r *mutationResolver) CreateSquad(ctx context.Context, opts model.NewSquad) (*model.Squad, error) {
-	panic(fmt.Errorf("not implemented: CreateSquad - CreateSquad"))
+	squad, err := r.squadSvc.Create(ctx, squad.CreateOpts{
+		AccountID:        hillchartsapi.AccountID("1"),
+		CurrentCycleName: "Some new cycle",
+		Name:             opts.Name,
+		OrganizationID:   hillchartsapi.OrganizationID(os.Getenv("DEFAULT_ORG_ID")),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.Squad{
+		CurrentCycleName: squad.CurrentCycleName,
+		ID:               string(squad.ID),
+		Name:             squad.Name,
+		Scope:            []*model.Scope{},
+	}, nil
 }
 
 // CreateScope is the resolver for the CreateScope field.

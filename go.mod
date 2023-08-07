@@ -7,6 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.17.16
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v1.5.4
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/rs/cors v1.9.0

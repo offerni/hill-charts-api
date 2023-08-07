@@ -68,10 +68,13 @@ func (repo *squadRepo) getSquadsCollection(
 	squadModels := []*models.Squad{}
 	for _, squad := range squadModelMultiple {
 		squadModels = append(squadModels, &models.Squad{
-			AccountID:      squad.AccountID,
-			ID:             squad.ID,
-			Name:           squad.Name,
-			OrganizationID: squad.OrganizationID,
+			AccountID:        squad.AccountID,
+			CreatedAt:        squad.CreatedAt,
+			CurrentCycleName: squad.CurrentCycleName,
+			ID:               squad.ID,
+			ModifiedAt:       squad.ModifiedAt,
+			Name:             squad.Name,
+			OrganizationID:   squad.OrganizationID,
 		})
 
 	}

@@ -1,6 +1,9 @@
 package hillchartsapi
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type SquadID string
 
@@ -8,8 +11,10 @@ const SquadIDPrefix = "sqd"
 
 type Squad struct {
 	AccountID        AccountID
+	CreatedAt        time.Time
 	CurrentCycleName string
 	ID               SquadID
+	ModifiedAt       time.Time
 	Name             string
 	OrganizationID   OrganizationID
 }
@@ -33,6 +38,6 @@ type SquadFindAllOpts struct {
 }
 
 type SquadRepository interface {
-	// Create(ctx context.Context, opts SquadCreateOpts) (*Squad, error)
+	Create(ctx context.Context, opts SquadCreateOpts) (*Squad, error)
 	FindAll(ctx context.Context, opts SquadFindAllOpts) (*SquadList, error)
 }
